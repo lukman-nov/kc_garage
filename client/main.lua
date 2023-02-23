@@ -7,21 +7,6 @@ CreateThread(function()
 	end 
 end)
 
-function DrawText3Ds(x, y, z, text)
-  local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-  SetTextScale(0.32, 0.32)
-  SetTextFont(4)
-  SetTextProportional(1)
-  SetTextColour(255, 255, 255, 255)
-  SetTextEntry("STRING")
-  SetTextCentre(1)
-  AddTextComponentString(text)
-  DrawText(_x, _y)
-  local factor = (string.len(text)) / 500
-  DrawRect(_x, _y + 0.0125, 0.015 + factor, 0.03, 0, 0, 0, 80)
-end
-
-
 CreateThread(function()
   for k, v in pairs(Config.Garages) do
     if v.Blip then
@@ -189,12 +174,13 @@ end)
 
 RegisterCommand('lockvehicle', function()
   local vehicle, dist = ESX.Game.GetClosestVehicle()
+  local plate = ESX.Game.GetVehicleProperties(vehicle).plate
   if dist < 10 and vehicle > 0 then
     ClearPedTasks(PlayerPedId())
     Wait(100)
-    TriggerServerEvent('kc_garage:RequestVehicleLock', VehToNet(vehicle), GetVehicleDoorLockStatus(vehicle))
+    TriggerServerEvent('kc_garage:RequestVehicleLock', VehToNet(vehicle), GetVehicleDoorLockStatus(vehicle), plate)
   else
-    exports['mythic_notify']:DoHudText('inform', _U('no_vehicle_found'))
+    exports['mythic_notify']:DoHudText('error', _U('no_vehicle'))
   end
 end)
 
@@ -204,7 +190,9 @@ RegisterCommand('givekeys', function()
   local closestP, closestD = ESX.Game.GetClosestPlayer()
   local vehicle, dist = ESX.Game.GetClosestVehicle()
   if DoesEntityExist(vehicle) and closestP ~= -1 and closestD < 4 and dist < 10 then
-    local plate = GetVehicleNumberPlateText(vehicle)
+    local plate = ESX.Game.GetVehicleProperties(vehicle).plate
     TriggerServerEvent('kc_garage:GiveKeyToPerson', plate, GetPlayerServerId(closestP))
+  else
+    exports['mythic_notify']:DoHudText('error', _U('no_players'))
   end
 end)

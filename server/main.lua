@@ -55,25 +55,21 @@ ESX.RegisterServerCallback('kc_garage:checkVehicleOwner', function(source, cb, p
 	end)
 end)
 
-RegisterNetEvent('kc_garage:RequestVehicleLock', function(netId, lockstatus)
+RegisterNetEvent('kc_garage:RequestVehicleLock', function(netId, lockstatus, plate)
   local vehicle = NetworkGetEntityFromNetworkId(netId)
-  local plate = GetVehicleNumberPlateText(vehicle)
   local xPlayer = ESX.GetPlayerFromId(source)
-  if not plate then 
-		TriggerClientEvent('inform', source, { type = 'error', text = _U('vehicle_not_found')})
-		return 
-	end
+  if not plate then return end
   if not vehiclesCache[plate] then
-    local result = MySQL.Sync.fetchAll('SELECT owner, peopleWithKeys FROM owned_vehicles WHERE plate = "'..plate..'"')
-    if result and result[1] then
-      vehiclesCache[plate] = {}
-      vehiclesCache[plate][result[1].owner] = true
-      local otherKeys = json.decode(result[1].peopleWithKeys)
-      if not otherKeys then otherKeys = {} end
-      for k, v in pairs(otherKeys) do
-        vehiclesCache[plate][v] = true
-      end
-    end
+		local result = MySQL.Sync.fetchAll('SELECT owner, peopleWithKeys FROM owned_vehicles WHERE plate = "'..plate..'"')
+		if result and result[1] then
+			vehiclesCache[plate] = {}
+			vehiclesCache[plate][result[1].owner] = true
+			local otherKeys = json.decode(result[1].peopleWithKeys)
+			if not otherKeys then otherKeys = {} end
+			for k, v in pairs(otherKeys) do
+				vehiclesCache[plate][v] = true
+			end
+		end
   end
   if vehiclesCache[plate] and (vehiclesCache[plate][xPlayer.identifier] or vehiclesCache[plate][xPlayer.job.name]) then
     SetVehicleDoorsLocked(vehicle, lockstatus == 2 and 1 or 2)
