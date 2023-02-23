@@ -7,5 +7,6 @@ Locales['en'] = {
   ['vehicle_locked'] = 'Vehicle has been successfuly locked',
   ['vehicle_unlocked'] = 'Vehicle has been successfuly unlocked',
   ['lock_vehicle'] = 'Toggle vehicle locks',
-  ['no_players'] = 'No other players around you'
+  ['no_players'] = 'No other players around you',
+  ['veh_block'] = 'Unable to retrieve vehicle, Spawn Position is blocked.',
 }

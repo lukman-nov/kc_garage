@@ -116,17 +116,21 @@ end)
 
 RegisterNetEvent('kc_garage:spawnVehicle')
 AddEventHandler('kc_garage:spawnVehicle', function(data)
-  ESX.Game.SpawnVehicle(data.model, Config.Garages[data.parking].SpawnPoint.pos, Config.Garages[data.parking].SpawnPoint.heading, function(vehicle)
-		ESX.Game.SetVehicleProperties(vehicle, data.props)
-    SetEntityAsMissionEntity(vehicle, true, true)
-    SetVehicleEngineHealth(vehicle, data.eHealth + 0.0)
-    exports["LegacyFuel"]:SetFuel(vehicle, data.props.fuelLevel)
-		TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
-    SetVehicleEngineOn(vehicle, true, true)
+  if ESX.Game.IsSpawnPointClear(Config.Garages[data.parking].SpawnPoint.pos, 2.5) then
+    ESX.Game.SpawnVehicle(data.model, Config.Garages[data.parking].SpawnPoint.pos, Config.Garages[data.parking].SpawnPoint.heading, function(vehicle)
+      ESX.Game.SetVehicleProperties(vehicle, data.props)
+      SetEntityAsMissionEntity(vehicle, true, true)
+      SetVehicleEngineHealth(vehicle, data.eHealth + 0.0)
+      exports["LegacyFuel"]:SetFuel(vehicle, data.props.fuelLevel)
+      TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
+      SetVehicleEngineOn(vehicle, true, true)
 
-    local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
-    TriggerServerEvent('kc_garage:updateOwnedVehicle', 0, false, 'SandyShores', vehicleProps)
-	end)
+      local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
+      TriggerServerEvent('kc_garage:updateOwnedVehicle', 0, false, 'SandyShores', vehicleProps)
+    end)
+  else
+    exports['mythic_notify']:DoHudText('error', _U('veh_block'))
+  end
 end)
 
 RegisterNetEvent('kc_garage:CarLockedEffect')
