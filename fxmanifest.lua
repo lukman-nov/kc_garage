@@ -4,9 +4,10 @@ game 'gta5'
 
 author 'Lukman_Nov#5797'
 description 'KC Garage'
+repository 'https://github.com/lukman-nov/kc_garage'
 
 lua54 'yes'
-version '1.0.0'
+version '1.0.1'
 
 shared_scripts {
 	'@es_extended/imports.lua',

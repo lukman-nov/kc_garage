@@ -7,8 +7,26 @@ CreateThread(function()
 	end 
 end)
 
+function addonNPC(x, y, z, heading)
+  RequestModel(GetHashKey(Config.Ped.Model))
+  while not HasModelLoaded(GetHashKey(Config.Ped.Model)) do
+      Wait(15)
+  end
+  ped = CreatePed(4, Config.Ped.Hash, x, y, z - 1, 3374176, false, true)
+  SetEntityHeading(ped, heading)
+  FreezeEntityPosition(ped, true)
+  SetEntityInvincible(ped, true)
+  SetBlockingOfNonTemporaryEvents(ped, true)
+end
+
 CreateThread(function()
-  for k, v in pairs(Config.Garages) do
+  for _, v in pairs(Config.Garages) do
+    addonNPC(v.EntryPoint[1],v.EntryPoint[2],v.EntryPoint[3], v.PedHeading)
+  end
+end)
+
+CreateThread(function()
+  for _, v in pairs(Config.Garages) do
     if v.Blip then
       local blip = AddBlipForCoord(v.EntryPoint)
       SetBlipSprite(blip, 357)
@@ -17,7 +35,7 @@ CreateThread(function()
       SetBlipScale(blip, 0.8)
       SetBlipAsShortRange(blip, true)
       BeginTextCommandSetBlipName('STRING')
-      AddTextComponentSubstringPlayerName('Garasi '..v.Name)
+      AddTextComponentSubstringPlayerName(_U('garage', v.Name))
       EndTextCommandSetBlipName(blip)
     end
   end
@@ -28,7 +46,7 @@ CreateThread(function()
     {
       name = 'getVehGarage',
       icon = 'fa-solid fa-car',
-      label = 'Ambil Kendaraan',
+      label = _U('get_vehicle'),
       event = 'kc_garage:getVehList'
     },
   })
@@ -36,7 +54,7 @@ end)
 
 CreateThread(function()
   while true do
-    local Sleep = 2500
+    local Sleep = 2000
 		local playerPed = GetPlayerPed(-1)
     local playerCoords = GetEntityCoords(playerPed)
 		local vehicle = GetVehiclePedIsIn(playerPed, false)
@@ -56,7 +74,7 @@ CreateThread(function()
                 DeleteVehicle(vehicle)
                 TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, k, false, vehicleProps)
               else
-                exports['mythic_notify']:DoHudText('error', _U('not_yours_vehicle'))
+                TriggerEvent('kc_garage:notify', 'error', _U('not_yours_vehicle'))
               end
             end, vehicleProps.plate)
           end
@@ -75,7 +93,7 @@ AddEventHandler('kc_garage:getVehList', function()
     local vehiclesTableList = {}
     local garage
 
-    for k, v in pairs(Config.Garages) do
+    for _, v in pairs(Config.Garages) do
       if #(playerCoords - v.EntryPoint) < 3.0 then
         garage = v.Name
       end
@@ -106,7 +124,7 @@ AddEventHandler('kc_garage:getVehList', function()
       end
       lib.registerContext({
         id = 'garage_menu',
-        title = 'Garasi '..garage,
+        title = _U('garage', garage),
         options = vehiclesTableList
       })
       lib.showContext('garage_menu')
@@ -121,7 +139,11 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
       ESX.Game.SetVehicleProperties(vehicle, data.props)
       SetEntityAsMissionEntity(vehicle, true, true)
       SetVehicleEngineHealth(vehicle, data.eHealth + 0.0)
-      exports["LegacyFuel"]:SetFuel(vehicle, data.props.fuelLevel)
+      if Config.LegacyFuel then
+        exports["LegacyFuel"]:SetFuel(vehicle, data.props.fuelLevel)
+      else 
+        SetVehicleFuelLevel(vehicle, data.props.fuelLevel)
+      end
       TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
       SetVehicleEngineOn(vehicle, true, true)
 
@@ -129,7 +151,7 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
       TriggerServerEvent('kc_garage:updateOwnedVehicle', 0, false, 'SandyShores', vehicleProps)
     end)
   else
-    exports['mythic_notify']:DoHudText('error', _U('veh_block'))
+    TriggerEvent('kc_garage:notify', 'error', _U('veh_block'))
   end
 end)
 
@@ -157,9 +179,9 @@ AddEventHandler('kc_garage:CarLockedEffect', function(netId, lockStatus)
     PlayVehicleDoorOpenSound(vehicle, 1)
     SetVehicleDoorsLockedForAllPlayers(vehicle, lockStatus)
     if lockStatus then
-      exports['mythic_notify']:DoHudText('inform', _U('vehicle_locked'))
+      TriggerEvent('kc_garage:notify', 'inform', _U('vehicle_locked'))
     else
-      exports['mythic_notify']:DoHudText('inform', _U('vehicle_unlocked'))
+      TriggerEvent('kc_garage:notify', 'inform', _U('vehicle_unlocked'))
     end
     SetVehicleLights(vehicle, 2)
     StartVehicleHorn(vehicle, 50, 'HELDDOWN', false)
@@ -176,15 +198,30 @@ AddEventHandler('kc_garage:CarLockedEffect', function(netId, lockStatus)
   end
 end)
 
+RegisterNetEvent('kc_garage:notify')
+AddEventHandler('kc_garage:notify', function(type, args)
+  if Config.Notify == 'mythic_notify' then
+    exports['mythic_notify']:DoHudText(type, args)
+  elseif Config.Notify == 'lib' then
+    lib.notify({
+      description = args,
+      type = type
+    })
+  elseif Config.Notify == 'ESX' then
+    ESX.ShowNotification(args)
+  end
+end)
+
 RegisterCommand('lockvehicle', function()
   local vehicle, dist = ESX.Game.GetClosestVehicle()
-  local plate = ESX.Game.GetVehicleProperties(vehicle).plate
+
   if dist < 10 and vehicle > 0 then
+    local plate = ESX.Game.GetVehicleProperties(vehicle).plate
     ClearPedTasks(PlayerPedId())
     Wait(100)
     TriggerServerEvent('kc_garage:RequestVehicleLock', VehToNet(vehicle), GetVehicleDoorLockStatus(vehicle), plate)
-  else
-    exports['mythic_notify']:DoHudText('error', _U('no_vehicle'))
+  else 
+    TriggerEvent('kc_garage:notify', 'error', _U('no_vehicle'))
   end
 end)
 
@@ -197,6 +234,6 @@ RegisterCommand('givekeys', function()
     local plate = ESX.Game.GetVehicleProperties(vehicle).plate
     TriggerServerEvent('kc_garage:GiveKeyToPerson', plate, GetPlayerServerId(closestP))
   else
-    exports['mythic_notify']:DoHudText('error', _U('no_players'))
+    TriggerEvent('kc_garage:notify', 'inform', _U('no_players'))
   end
 end)

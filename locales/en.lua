@@ -1,4 +1,6 @@
 Locales['en'] = {
+  ['garage'] = 'Garage %s',
+  ['get_vehicle'] = 'Get Vehicles',
   ['no_vehicle'] = 'We were unable to find the vehicle\'s',
   ['no_keys'] = 'You do not have keys of this vehicle',
   ['not_yours_vehicle'] = 'This vehicle is not yours',

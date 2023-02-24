@@ -75,7 +75,7 @@ RegisterNetEvent('kc_garage:RequestVehicleLock', function(netId, lockstatus, pla
     SetVehicleDoorsLocked(vehicle, lockstatus == 2 and 1 or 2)
     TriggerClientEvent('kc_garage:CarLockedEffect', xPlayer.source, netId, lockstatus ~= 2)
   else
-		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = _U('no_keys')})
+    TriggerClientEvent('kc_garage:notify', xPlayer.source, 'inform', _U('no_keys'))
   end
 end)
 
@@ -93,8 +93,8 @@ RegisterNetEvent('kc_garage:GiveKeyToPerson', function(plate, target)
 			['@plate'] = plate
 		}, function(rowsUpdated)
 			if rowsUpdated > 0 then
-			TriggerClientEvent('mythic_notify:client:SendAlert', xTarget.source, { type = 'inform', text = _U('received_keys', plate)})
-			TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'inform', text = _U('gave_keys', plate)})
+				TriggerClientEvent('kc_garage:notify', xTarget.source, 'inform', _U('received_keys', plate))
+				TriggerClientEvent('kc_garage:notify', xPlayer.source, 'inform', _U('gave_keys', plate))
 			end
 		end)
 		
@@ -103,7 +103,7 @@ RegisterNetEvent('kc_garage:GiveKeyToPerson', function(plate, target)
 		end
 	
 	else
-		TriggerClientEvent('mythic_notify:client:SendAlert', xPlayer.source, { type = 'error', text = _U('not_yours_vehicle')})
+		TriggerClientEvent('kc_garage:notify', xPlayer.source, 'inform', _U('not_yours_vehicle'))
 	end
 end)
 
