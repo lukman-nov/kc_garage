@@ -4,16 +4,15 @@ RegisterServerEvent('kc_garage:updateOwnedVehicle')
 AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, Impound, vehicleProps)
 	local src = source
 	local xPlayer  = ESX.GetPlayerFromId(src)
-
-		MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `pound` = @Impound, `vehicle` = @vehicle WHERE `plate` = @plate AND `owner` = @identifier',
-		{
-			['@identifier'] = xPlayer.identifier,
-			['@vehicle'] 	= json.encode(vehicleProps),
-			['@plate'] 		= vehicleProps.plate,
-			['@stored']     = stored,
-			['@parking']    = parking,
-			['@Impound']    	= Impound
-		})
+	MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `pound` = @Impound, `vehicle` = @vehicle WHERE `plate` = @plate AND `owner` = @identifier',
+	{
+		['@identifier'] = xPlayer.identifier,
+		['@vehicle'] 	= json.encode(vehicleProps),
+		['@plate'] 		= vehicleProps.plate,
+		['@stored']     = stored,
+		['@parking']    = parking,
+		['@Impound']    	= Impound
+	})
 end)
 
 ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb)

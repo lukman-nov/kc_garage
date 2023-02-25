@@ -148,7 +148,7 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
       SetVehicleEngineOn(vehicle, true, true)
 
       local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
-      TriggerServerEvent('kc_garage:updateOwnedVehicle', 0, false, 'SandyShores', vehicleProps)
+      TriggerServerEvent('kc_garage:updateOwnedVehicle', 2, false, false, vehicleProps)
     end)
   else
     TriggerEvent('kc_garage:notify', 'error', _U('veh_block'))
