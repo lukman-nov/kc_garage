@@ -6,9 +6,6 @@ CREATE TABLE IF NOT EXISTS `owned_vehicles` (
   `job` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `stored` tinyint(1) NOT NULL DEFAULT 0,
   `parking` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `pound` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `glovebox` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `trunk` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `peopleWithKeys` longtext COLLATE utf8mb4_unicode_ci DEFAULT '[]',
   PRIMARY KEY (`plate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

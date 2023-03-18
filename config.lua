@@ -1,118 +1,371 @@
 Config = {}
-Config.Locale = 'en' -- en / id
-Config.ZoneSize = {x = 1.5, y = 1.5, z = 1.5}
-Config.MarkerColor = {r = 100, g = 0, b = 0}
-Config.MarkerType = 36
+Config.CheckForUpdates = true
+Config.Locale = 'id'
+Config.UseTarget = false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
-Config.LegacyFuel = true
-Config.Ped = {
-  Model = 'CSB_TrafficWarden',
-  Hash = 0xDE2937F3
+
+Config.TeleportToVehicle = false
+Config.AutoLockVeh = true
+
+Config.CmdVehDelete = 'asuransi'
+Config.DeleteVehicleTimer = 180 -- in second
+Config.DeleteVehiclesIfInSafeZone = true
+Config.PayIn = 'money' -- 'money' = cash, 'bank' = bank
+
+Config.VehicleFee = {
+  Garages = {
+    [0] = 5000, -- Compacts
+    [1] = 5000, -- Sedans
+    [2] = 5000, -- SUVs
+    [3] = 5000, -- Coupes
+    [4] = 5000, -- Muscle
+    [5] = 5000, -- Sports Classics
+    [6] = 5000, -- Sports
+    [7] = 5000, -- Super
+    [8] = 2000, -- Motorcycles
+    [9] = 5000, -- Off-road
+    [10] = 5000, -- Industrial
+    [11] = 5000, -- Utility
+    [12] = 5000, -- Vans
+    [13] = 0, -- Cylces
+    [14] = 50000, -- Boats
+    [15] = 50000, -- Helicopters
+    [16] = 50000, -- Planes
+    [17] = 5000, -- Service
+    [18] = 0, -- Emergency
+    [19] = 5000, -- Military
+    [20] = 5000, -- Commercial
+    [21] = 5000 -- Train 
+  },
+  Impound = {
+    [0] = 15000, -- Compacts
+    [1] = 15000, -- Sedans
+    [2] = 15000, -- SUVs
+    [3] = 15000, -- Coupes
+    [4] = 15000, -- Muscle
+    [5] = 15000, -- Sports Classics
+    [6] = 15000, -- Sports
+    [7] = 15000, -- Super
+    [8] = 10000, -- Motorcycles
+    [9] = 15000, -- Off-road
+    [10] = 15000, -- Industrial
+    [11] = 15000, -- Utility
+    [12] = 15000, -- Vans
+    [13] = 0, -- Cylces
+    [14] = 150000, -- Boats
+    [15] = 150000, -- Helicopters
+    [16] = 150000, -- Planes
+    [17] = 15000, -- Service
+    [18] = 0, -- Emergency
+    [19] = 15000, -- Military
+    [20] = 15000, -- Commercial
+    [21] = 15000 -- Train 
+  }
 }
 
+Config.Peds = {
+  Garages = 'CSB_TrafficWarden',
+  Impound = 's_m_y_construct_01'
+}
+
+Config.GroupAllowed = {
+  'dev',
+  'moderator',
+  'headadmin',
+  'admin',
+}
+
+Config.DeleteVehiclesAt = {
+	{['h'] = 00, ['m'] = 00},
+	{['h'] = 03, ['m'] = 00},
+	{['h'] = 06, ['m'] = 00},
+	{['h'] = 09, ['m'] = 00},
+	{['h'] = 12, ['m'] = 00},
+	{['h'] = 15, ['m'] = 00},
+	{['h'] = 18, ['m'] = 00},
+	{['h'] = 21, ['m'] = 00},
+}
+
+Config.SafeZones = {
+	{ ['x'] = -44.155646565, ['y'] = -1100.155646565, ['z'] = 26.267009735108, ['radius'] = 50.0},
+	{ ['x'] = -1688.43811035156, ['y'] = -1073.62536621094, ['z'] = 13.1521873474121, ['radius'] = 200.0},
+	{ ['x'] = -2195.1352539063, ['y'] = 4288.7290039063, ['z'] = 49.173923492432, ['radius'] = 150.0},
+}
 
 Config.Garages = {
-  Garkot = {
-    EntryPoint = vector3(213.8823, -808.4344, 31.0149),
-    PedHeading = 340.1291,
-		SpawnPoint = {
-			pos = vector3(229.5511, -798.7303, 30.5843),
-			heading = 158.5577,
-		},
-    DeletePoint = vector3(214.0258, -792.9701, 30.8507),
-    ImpoundedName = "SandyShores",
-    Name = 'Garkot',
-    Blip = true
+  Legion = { -- key garages to input databases
+    Label = 'Legion', -- garage label
+    Blip = true, -- if private garages you can set false
+    Pay = true, -- fee garages
+    Coords = vector3(213.8823, -808.4344, 31.0149), -- blips and ped coords
+    PedHeading = 340.1291, -- ped heading
+    Players = { -- Players table allowed to access garages
+      -- ex: {'steam:xxxxxxxxxxxx'}
+    },
+    Groups = { -- Groups table allowed to access garages
+      -- ex: {'police'}
+    },
+    SpawnPoint = {
+      { Pos = vector3(221.3627, -809.6945, 30.1290), Heading = 248.5339 },
+      { Pos = vector3(221.9424, -807.0797, 30.1476), Heading = 248.5339 },
+      { Pos = vector3(222.7534, -804.3437, 30.1486), Heading = 248.5339 },
+      { Pos = vector3(223.8556, -801.9759, 30.1351), Heading = 248.5339 },
+      { Pos = vector3(224.4868, -799.4138, 30.1383), Heading = 248.5339 },
+      { Pos = vector3(225.3986, -796.8544, 30.1434), Heading = 248.5339 },
+    },
+    DeletePoint = {
+      { Pos = vector3(208.3163, -796.0580, 30.0) },
+      { Pos = vector3(205.3432, -800.8430, 30.0) },
+      { Pos = vector3(206.6767, -798.4037, 30.0) },
+      { Pos = vector3(209.2426, -793.8544, 30.0) },
+      { Pos = vector3(210.0643, -791.2812, 30.0) },
+    }
   },
 
   Terminal = {
-    EntryPoint = vector3(1222.0289, -2961.0095, 5.8661),
+    Label = 'Terminal',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(1222.0289, -2961.0095, 5.8661), 
     PedHeading = 95.1120,
-		SpawnPoint = {
-			pos = vector3(1217.5316, -2967.9685, 5.8661),
-			heading = 96.3912,
-		},
-    DeletePoint = vector3(1217.5316, -2967.9685, 5.8661),
-    ImpoundedName = "SandyShores",
-    Name = 'Terminal',
-    Blip = true
+    Players = {
+      
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(1217.5316, -2967.9685, 5.8661), Heading = 96.3912 },
+    },
+    DeletePoint = {
+      { Pos = vector3(1217.5316, -2967.9685, 5.0) }
+    }
   },
 
   Festival = {
-    EntryPoint = vector3(-1592.9933, -923.3627, 9.0223),
+    Label = 'Festival',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-1592.9933, -923.3627, 9.0223), 
     PedHeading = 53.7181,
-		SpawnPoint = {
-			pos = vector3(-1594.6050, -918.7351, 9.0548),
-			heading = 324.0361,
-		},
-    DeletePoint = vector3(-1594.6050, -918.7351, 9.0548),
-    ImpoundedName = "SandyShores",
-    Name = 'Festival',
-    Blip = true
+    Players = {
+      
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-1598.6584, -923.6129, 8.4312), Heading = 139.0172 },
+      { Pos = vector3(-1600.6407, -921.2331, 8.4414), Heading = 139.2408 },
+      { Pos = vector3(-1603.2598, -919.4777, 8.4354), Heading = 140.2991 },
+      { Pos = vector3(-1605.3907, -917.2253, 8.4415), Heading = 139.6384 },
+      { Pos = vector3(-1607.4508, -914.8009, 8.4508), Heading = 140.9010 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-1594.1393, -918.3148, 8.0) },
+      { Pos = vector3(-1596.5669, -916.2999, 8.0) },
+      { Pos = vector3(-1598.9159, -914.2520, 8.0) },
+      { Pos = vector3(-1601.1835, -912.2111, 8.0) },
+      { Pos = vector3(-1603.5889, -910.2061, 8.0) },
+    }
   },
 
   Paleto = {
-    EntryPoint = vector3(79.6358, 6404.2163, 31.4458),
+    Label = 'Paleto',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(79.6358, 6404.2163, 31.4458), 
     PedHeading = 131.1130,
-		SpawnPoint = {
-			pos = vector3(61.8819, 6404.5850, 31.2258),
-			heading = 225.9015,
-		},
-    DeletePoint = vector3(75.0499, 6401.1724, 31.2258),
-    ImpoundedName = "SandyShores",
-    Name = 'Paleto',
-    Blip = true
+    Players = {
+      
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(61.8341, 6404.0713, 30.7141), Heading = 215.2714 },
+      { Pos = vector3(59.0627, 6400.9746, 30.7144), Heading = 214.8043 },
+      { Pos = vector3(64.7686, 6406.2705, 30.7141), Heading = 211.2245 }
+    },
+    DeletePoint = {
+      { Pos = vector3(72.4021, 6404.3438, 30.0) },
+      { Pos = vector3(75.4666, 6401.4907, 30.0) },
+      { Pos = vector3(78.1349, 6398.5815, 30.0) },
+      { Pos = vector3(81.0012, 6395.9927, 30.0) }
+    }
+  },
+
+  SandyShores = {
+    Label = 'Sandy Shores',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(1894.9961, 3714.3591, 32.7538), 
+    PedHeading = 118.3539,
+    Players = {
+      
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(1888.0814, 3716.1348, 32.3407), Heading = 121.8960 },
+      { Pos = vector3(1885.9080, 3719.4238, 32.3447), Heading = 119.4130 },
+      { Pos = vector3(1884.1178, 3722.4272, 32.3363), Heading = 118.8460 }
+    },
+    DeletePoint = {
+      { Pos = vector3(1888.0814, 3716.1348, 32.0)},
+      { Pos = vector3(1885.9080, 3719.4238, 32.0)},
+      { Pos = vector3(1884.1178, 3722.4272, 32.0)}
+    }
   },
 
   MilitaryBase = {
-    EntryPoint = vector3(-1839.8710, 3027.7827, 32.8105),
+    Label = 'Military Base',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-1839.8710, 3027.7827, 32.8105), 
     PedHeading = 67.3806,
-		SpawnPoint = {
-			pos = vector3(-1836.0492, 3034.3628, 32.8105),
-			heading = 63.4989,
-		},
-    DeletePoint = vector3(-1836.0492, 3034.3628, 32.8105),
-    ImpoundedName = "SandyShores",
-    Name = 'Military Base',
-    Blip = true
+    Players = {
+      {'steam:11000010836eaab'}
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-1836.0492, 3034.3628, 32.8105), Heading = 63.4989 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-1836.0492, 3034.3628, 32.0) }
+    }
   },
 
   MirrorPark = {
-    EntryPoint = vector3(1035.1742, -765.1974, 57.9947),
+    Label = 'Mirror Park',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(1035.1742, -765.1974, 57.9947), 
     PedHeading = 153.8849,
-		SpawnPoint = {
-			pos = vector3(1031.1766, -772.9459, 58.0591),
-			heading = 144.1060,
-		},
-    DeletePoint = vector3(1031.1766, -772.9459, 58.0591),
-    ImpoundedName = "SandyShores",
-    Name = 'Mirror Park',
-    Blip = true
+    Players = {
+
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(1027.6094, -771.8443, 57.5259), Heading = 145.7455 },
+      { Pos = vector3(1030.7230, -773.7680, 57.5479), Heading = 143.9065 },
+    },
+    DeletePoint = {
+      { Pos = vector3(1027.6094, -771.8443, 57.0)},
+      { Pos = vector3(1030.7230, -773.7680, 57.0)},
+    }
   },
 
   MekanikKota = {
-    EntryPoint = vector3(-392.6733, -125.0899, 38.6859),
-    PedHeading = 295.8077,
-		SpawnPoint = {
-			pos = vector3(-389.2494, -125.0418, 38.6858),
-			heading = 297.1382,
-		},
-    DeletePoint = vector3(-389.2494, -125.0418, 38.6858),
-    ImpoundedName = "SandyShores",
-    Name = 'Mekanik Kota',
-    Blip = true
+    Label = 'Mekanik Kota',
+    Blip = false,
+    Pay = false,
+    Coords = vector3(-384.0035, -140.4050, 38.6857), 
+    PedHeading = 301.6765,
+    Players = {
+
+    },
+    Groups = {
+      {'mechanic'}
+    },
+    SpawnPoint = {
+      { Pos = vector3(-381.7652, -137.0106, 38.1750), Heading = 298.8808 },
+      { Pos = vector3(-379.4821, -139.7043, 38.1742), Heading = 299.6868 },
+      { Pos = vector3(-378.4056, -143.2687, 38.1742), Heading = 299.8542 },
+      { Pos = vector3(-376.9904, -146.4754, 38.1736), Heading = 298.1663 },
+      { Pos = vector3(-383.5086, -134.0326, 38.1746), Heading = 298.9847 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-381.7652, -137.0106, 38.0)},
+      { Pos = vector3(-379.4821, -139.7043, 38.0)},
+      { Pos = vector3(-378.4056, -143.2687, 38.0)},
+      { Pos = vector3(-376.9904, -146.4754, 38.0)},
+      { Pos = vector3(-383.5086, -134.0326, 38.0)},
+    }
+  },
+
+  EclipseHospital = {
+    Label = 'Eclipse Hospital',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-656.2633, 351.4507, 78.1183), 
+    PedHeading = 183.5614,
+    Players = {
+
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-658.0089, 348.9457, 77.6068), Heading = 175.7422 },
+      { Pos = vector3(-658.0089, 348.9457, 77.6068), Heading = 175.7422 },
+      { Pos = vector3(-661.4048, 349.1467, 77.6067), Heading = 175.7422 },
+      { Pos = vector3(-664.7354, 349.3837, 77.6068), Heading = 175.7422 },
+      { Pos = vector3(-668.1645, 349.8712, 77.6069), Heading = 175.7422 },
+      { Pos = vector3(-671.7061, 350.3329, 77.6067), Heading = 175.7422 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-658.0089, 348.9457, 77.0) },
+      { Pos = vector3(-661.4048, 349.1467, 77.0) },
+      { Pos = vector3(-664.7354, 349.3837, 77.0) },
+      { Pos = vector3(-668.1645, 349.8712, 77.0) },
+      { Pos = vector3(-671.7061, 350.3329, 77.0) },
+    }
+  },
+
+  KucluckHouse = {
+    Label = 'Kucluck House',
+    Blip = false,
+    Pay = false,
+    Coords = vector3(-548.7320, 5004.7842, 153.5449), 
+    PedHeading = 235.7023,
+    Players = {
+      {'steam:11000010836eaab'}
+    },
+    Groups = {
+
+    },
+    SpawnPoint = {
+      { Pos = vector3(-541.0726, 5009.7109, 153.5407), Heading = 232.1175 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-541.0726, 5009.7109, 153.5407) },
+    }
   },
   
-  EclipseHospital = {
-    EntryPoint = vector3(-656.2633, 351.4507, 78.1183),
-    PedHeading = 183.5614,
+}
+
+Config.Impound = {
+	SandyShores = {
+		Label = 'Sandy Shores',
+    IsDefaultImpound = true,
+		Blip = true,
+    Pay = true,
+		Coords = vector3(252.6010, 2595.8438, 44.8995),
+		PedHeading = 11.6176,
 		SpawnPoint = {
-			pos = vector3(-665.3526, 344.1519, 78.1183),
-			heading = 77.0001,
+			{ Pos = vector3(258.5054, 2590.7029, 44.4424), Heading = 10.3867, }
 		},
-    DeletePoint = vector3(-650.2255, 352.6722, 78.1183),
-    ImpoundedName = "SandyShores",
-    Name = 'Eclipse Hospital',
-    Blip = true
-  },
+	},
+
+	JobsImpound = { -- if for jobs keywords should start with the word Jobs
+		Label = 'Jobs',
+    IsDefaultImpound = false,
+		Blip = true,
+    Pay = false,
+		Coords = vector3(409.5207, -1623.1407, 29.2919),
+		PedHeading = 226.8043,
+		SpawnPoint = {
+			{ Pos = vector3(416.9999, -1627.8965, 29.0), Heading = 137.3000, },
+			{ Pos = vector3(419.6365, -1629.6110, 29.0), Heading = 135.3693, },
+			{ Pos = vector3(420.4732, -1635.9071, 29.0), Heading = 88.7233, },
+			{ Pos = vector3(420.4871, -1638.9510, 29.0), Heading = 86.0705, },
+			{ Pos = vector3(420.5472, -1641.9459, 29.0), Heading = 87.1742, },
+		},
+	},
 }
