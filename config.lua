@@ -1,6 +1,6 @@
 Config = {}
 Config.CheckForUpdates = true
-Config.Locale = 'id'
+Config.Locale = 'en'
 Config.UseTarget = false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 
@@ -11,8 +11,7 @@ Config.CmdVehDelete = 'asuransi'
 Config.DeleteVehicleTimer = 180 -- in second
 Config.DeleteVehiclesIfInSafeZone = true
 Config.PayIn = 'money' -- 'money' = cash, 'bank' = bank
-
-Config.VehicleFee = {
+Config.VehicleFee = { -- Set 0 for free
   Garages = {
     [0] = 5000, -- Compacts
     [1] = 5000, -- Sedans
@@ -95,10 +94,11 @@ Config.SafeZones = {
 Config.Garages = {
   Legion = { -- key garages to input databases
     Label = 'Legion', -- garage label
+    Type = 'car',
     Blip = true, -- if private garages you can set false
     Pay = true, -- fee garages
-    Coords = vector3(213.8823, -808.4344, 31.0149), -- blips and ped coords
-    PedHeading = 340.1291, -- ped heading
+    Coords = vector3(214.6728, -806.7095, 30.8073), -- blips and ped coords
+    PedHeading = 337.9022, -- ped heading
     Players = { -- Players table allowed to access garages
       -- ex: {'steam:xxxxxxxxxxxx'}
     },
@@ -114,16 +114,17 @@ Config.Garages = {
       { Pos = vector3(225.3986, -796.8544, 30.1434), Heading = 248.5339 },
     },
     DeletePoint = {
-      { Pos = vector3(208.3163, -796.0580, 30.0) },
-      { Pos = vector3(205.3432, -800.8430, 30.0) },
-      { Pos = vector3(206.6767, -798.4037, 30.0) },
-      { Pos = vector3(209.2426, -793.8544, 30.0) },
-      { Pos = vector3(210.0643, -791.2812, 30.0) },
+      { Pos = vector3(206.0533, -800.8460, 30.9834) },
+      { Pos = vector3(206.8243, -798.4073, 30.9834) },
+      { Pos = vector3(207.7707, -796.0760, 30.9834) },
+      { Pos = vector3(209.2426, -793.8544, 30.9834) },
+      { Pos = vector3(210.0643, -791.2812, 30.9834) },
     }
   },
 
   Terminal = {
     Label = 'Terminal',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(1222.0289, -2961.0095, 5.8661), 
@@ -138,12 +139,13 @@ Config.Garages = {
       { Pos = vector3(1217.5316, -2967.9685, 5.8661), Heading = 96.3912 },
     },
     DeletePoint = {
-      { Pos = vector3(1217.5316, -2967.9685, 5.0) }
+      { Pos = vector3(1217.5316, -2967.9685, 5.8661) }
     }
   },
 
   Festival = {
     Label = 'Festival',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(-1592.9933, -923.3627, 9.0223), 
@@ -162,16 +164,17 @@ Config.Garages = {
       { Pos = vector3(-1607.4508, -914.8009, 8.4508), Heading = 140.9010 },
     },
     DeletePoint = {
-      { Pos = vector3(-1594.1393, -918.3148, 8.0) },
-      { Pos = vector3(-1596.5669, -916.2999, 8.0) },
-      { Pos = vector3(-1598.9159, -914.2520, 8.0) },
-      { Pos = vector3(-1601.1835, -912.2111, 8.0) },
-      { Pos = vector3(-1603.5889, -910.2061, 8.0) },
+      { Pos = vector3(-1594.1393, -918.3148, 8.4508) },
+      { Pos = vector3(-1596.5669, -916.2999, 8.4508) },
+      { Pos = vector3(-1598.9159, -914.2520, 8.4508) },
+      { Pos = vector3(-1601.1835, -912.2111, 8.4508) },
+      { Pos = vector3(-1603.5889, -910.2061, 8.4508) },
     }
   },
 
   Paleto = {
     Label = 'Paleto',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(79.6358, 6404.2163, 31.4458), 
@@ -188,15 +191,16 @@ Config.Garages = {
       { Pos = vector3(64.7686, 6406.2705, 30.7141), Heading = 211.2245 }
     },
     DeletePoint = {
-      { Pos = vector3(72.4021, 6404.3438, 30.0) },
-      { Pos = vector3(75.4666, 6401.4907, 30.0) },
-      { Pos = vector3(78.1349, 6398.5815, 30.0) },
-      { Pos = vector3(81.0012, 6395.9927, 30.0) }
+      { Pos = vector3(72.4021, 6404.3438, 30.7144) },
+      { Pos = vector3(75.4666, 6401.4907, 30.7144) },
+      { Pos = vector3(78.1349, 6398.5815, 30.7144) },
+      { Pos = vector3(81.0012, 6395.9927, 30.7144) }
     }
   },
 
   SandyShores = {
     Label = 'Sandy Shores',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(1894.9961, 3714.3591, 32.7538), 
@@ -213,20 +217,21 @@ Config.Garages = {
       { Pos = vector3(1884.1178, 3722.4272, 32.3363), Heading = 118.8460 }
     },
     DeletePoint = {
-      { Pos = vector3(1888.0814, 3716.1348, 32.0)},
-      { Pos = vector3(1885.9080, 3719.4238, 32.0)},
-      { Pos = vector3(1884.1178, 3722.4272, 32.0)}
+      { Pos = vector3(1888.0814, 3716.1348, 32.3447)},
+      { Pos = vector3(1885.9080, 3719.4238, 32.3447)},
+      { Pos = vector3(1884.1178, 3722.4272, 32.3447)}
     }
   },
 
   MilitaryBase = {
     Label = 'Military Base',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(-1839.8710, 3027.7827, 32.8105), 
     PedHeading = 67.3806,
     Players = {
-      {'steam:11000010836eaab'}
+
     },
     Groups = {
       
@@ -235,18 +240,19 @@ Config.Garages = {
       { Pos = vector3(-1836.0492, 3034.3628, 32.8105), Heading = 63.4989 },
     },
     DeletePoint = {
-      { Pos = vector3(-1836.0492, 3034.3628, 32.0) }
+      { Pos = vector3(-1836.0492, 3034.3628, 32.8105) }
     }
   },
-
+  
   MirrorPark = {
     Label = 'Mirror Park',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(1035.1742, -765.1974, 57.9947), 
     PedHeading = 153.8849,
     Players = {
-
+      
     },
     Groups = {
       
@@ -256,19 +262,20 @@ Config.Garages = {
       { Pos = vector3(1030.7230, -773.7680, 57.5479), Heading = 143.9065 },
     },
     DeletePoint = {
-      { Pos = vector3(1027.6094, -771.8443, 57.0)},
-      { Pos = vector3(1030.7230, -773.7680, 57.0)},
+      { Pos = vector3(1027.6094, -771.8443, 57.5479)},
+      { Pos = vector3(1030.7230, -773.7680, 57.5479)},
     }
   },
-
+  
   MekanikKota = {
     Label = 'Mekanik Kota',
+    Type = 'car',
     Blip = false,
     Pay = false,
     Coords = vector3(-384.0035, -140.4050, 38.6857), 
     PedHeading = 301.6765,
     Players = {
-
+      
     },
     Groups = {
       {'mechanic'}
@@ -281,22 +288,23 @@ Config.Garages = {
       { Pos = vector3(-383.5086, -134.0326, 38.1746), Heading = 298.9847 },
     },
     DeletePoint = {
-      { Pos = vector3(-381.7652, -137.0106, 38.0)},
-      { Pos = vector3(-379.4821, -139.7043, 38.0)},
-      { Pos = vector3(-378.4056, -143.2687, 38.0)},
-      { Pos = vector3(-376.9904, -146.4754, 38.0)},
-      { Pos = vector3(-383.5086, -134.0326, 38.0)},
+      { Pos = vector3(-381.7652, -137.0106, 38.1750)},
+      { Pos = vector3(-379.4821, -139.7043, 38.1750)},
+      { Pos = vector3(-378.4056, -143.2687, 38.1750)},
+      { Pos = vector3(-376.9904, -146.4754, 38.1750)},
+      { Pos = vector3(-383.5086, -134.0326, 38.1750)},
     }
   },
-
+  
   EclipseHospital = {
     Label = 'Eclipse Hospital',
+    Type = 'car',
     Blip = true,
     Pay = true,
     Coords = vector3(-656.2633, 351.4507, 78.1183), 
     PedHeading = 183.5614,
     Players = {
-
+      
     },
     Groups = {
       
@@ -310,16 +318,17 @@ Config.Garages = {
       { Pos = vector3(-671.7061, 350.3329, 77.6067), Heading = 175.7422 },
     },
     DeletePoint = {
-      { Pos = vector3(-658.0089, 348.9457, 77.0) },
-      { Pos = vector3(-661.4048, 349.1467, 77.0) },
-      { Pos = vector3(-664.7354, 349.3837, 77.0) },
-      { Pos = vector3(-668.1645, 349.8712, 77.0) },
-      { Pos = vector3(-671.7061, 350.3329, 77.0) },
+      { Pos = vector3(-658.0089, 348.9457, 77.6067) },
+      { Pos = vector3(-661.4048, 349.1467, 77.6067) },
+      { Pos = vector3(-664.7354, 349.3837, 77.6067) },
+      { Pos = vector3(-668.1645, 349.8712, 77.6067) },
+      { Pos = vector3(-671.7061, 350.3329, 77.6067) },
     }
   },
-
+  
   KucluckHouse = {
     Label = 'Kucluck House',
+    Type = 'car',
     Blip = false,
     Pay = false,
     Coords = vector3(-548.7320, 5004.7842, 153.5449), 
@@ -328,7 +337,7 @@ Config.Garages = {
       {'steam:11000010836eaab'}
     },
     Groups = {
-
+      
     },
     SpawnPoint = {
       { Pos = vector3(-541.0726, 5009.7109, 153.5407), Heading = 232.1175 },
@@ -337,12 +346,111 @@ Config.Garages = {
       { Pos = vector3(-541.0726, 5009.7109, 153.5407) },
     }
   },
+
+  PoliceGarage = {
+    Label = 'Police Garage',
+    Type = 'car',
+    Blip = false,
+    Pay = false,
+    Coords = vector3(459.1317, -1010.4518, 28.1798),
+    PedHeading = 82.2547,
+    Players = {
+      
+    },
+    Groups = {
+      {'police'}
+    },
+    SpawnPoint = {
+      { Pos = vector3(446.0918, -1024.0363, 28.5160), Heading = 4.0892 },
+      { Pos = vector3(442.3278, -1025.4196, 28.6097), Heading = 6.3928 },
+      { Pos = vector3(438.3373, -1025.7689, 28.6909), Heading = 7.4139 },
+      { Pos = vector3(434.7534, -1026.3446, 28.7670), Heading = 6.0667 },
+      { Pos = vector3(430.9147, -1026.6952, 28.8344), Heading = 5.9158 },
+      { Pos = vector3(427.2970, -1027.0142, 28.9019), Heading = 6.3342 },
+    },
+    DeletePoint = {
+      { Pos = vector3(446.0918, -1024.0363, 28.5160) },
+      { Pos = vector3(442.3278, -1025.4196, 28.6097) },
+      { Pos = vector3(438.3373, -1025.7689, 28.6909) },
+      { Pos = vector3(434.7534, -1026.3446, 28.7670) },
+      { Pos = vector3(430.9147, -1026.6952, 28.8344) },
+      { Pos = vector3(427.2970, -1027.0142, 28.9019) },
+    }
+  },
+
+  LSAirPort = {
+    Label = 'Los Santos Airport',
+    Type = 'aircraft',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-1122.4502, -2840.5667, 13.9458), 
+    PedHeading = 152.0285,
+    Players = {
+      
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-1178.2308, -2845.7175, 13.9458), Heading = 146.1286 },
+      { Pos = vector3(-1145.8920, -2864.2798, 13.9460), Heading = 153.7971 },
+      { Pos = vector3(-1112.4072, -2883.8889, 13.9460), Heading = 152.9144 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-1178.2308, -2845.7175, 13.9458) },
+      { Pos = vector3(-1145.8920, -2864.2798, 13.9460) },
+      { Pos = vector3(-1112.4072, -2883.8889, 13.9460) },
+    }
+  },
   
+  MBAirport = {
+    Label = 'Military Base Airport',
+    Type = 'aircraft',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-2211.6267, 3167.5488, 32.8101), 
+    PedHeading = 330.5554,
+    Players = {
+  
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-2186.9236, 3172.0801, 32.8102), Heading = 326.1197 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-2186.9236, 3172.0801, 32.8102)},
+    }
+  },
+  
+  PacificOcean = {
+    Label = 'Pacific Ocean Watercraft',
+    Type = 'boat',
+    Blip = true,
+    Pay = true,
+    Coords = vector3(-1799.7592, -1225.0562, 1.5826), 
+    PedHeading = 144.0511,
+    Players = {
+  
+    },
+    Groups = {
+      
+    },
+    SpawnPoint = {
+      { Pos = vector3(-1796.9568, -1229.5969, 0.2092), Heading = 145.8580 },
+    },
+    DeletePoint = {
+      { Pos = vector3(-1796.9568, -1229.5969, 0.2092)},
+    }
+  },
+
 }
 
 Config.Impound = {
 	SandyShores = {
 		Label = 'Sandy Shores',
+    Type = 'car',
     IsDefaultImpound = true,
 		Blip = true,
     Pay = true,
@@ -353,8 +461,35 @@ Config.Impound = {
 		},
 	},
 
+	SandyShoresAir = {
+		Label = 'Sandy Shores Air',
+    Type = 'aircraft',
+    IsDefaultImpound = true,
+		Blip = true,
+    Pay = true,
+		Coords = vector3(1727.7544, 3293.1646, 41.1973),
+		PedHeading = 193.5272,
+		SpawnPoint = {
+			{ Pos = vector3(1749.2124, 3264.2148, 41.2852), Heading = 102.5581, }
+		},
+	},
+
+	SandyShoresBoat = {
+		Label = 'Sandy Shores Watercraft',
+    Type = 'boat',
+    IsDefaultImpound = true,
+		Blip = true,
+    Pay = true,
+		Coords = vector3(1733.4327, 3985.1807, 31.9787),
+		PedHeading = 121.1930,
+		SpawnPoint = {
+			{ Pos = vector3(1730.9972, 3990.8796, 29.7878), Heading = 304.6193, }
+		},
+	},
+
 	JobsImpound = { -- if for jobs keywords should start with the word Jobs
 		Label = 'Jobs',
+    Type = 'car',
     IsDefaultImpound = false,
 		Blip = true,
     Pay = false,

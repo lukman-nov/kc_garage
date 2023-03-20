@@ -1,5 +1,4 @@
 local ESX = nil
-local PlayerData = {}
 
 local vehicleClassName = {
   [0] = 'Compacts',
@@ -42,58 +41,84 @@ CreateThread(function()
 		Wait(10)
 	end 
   
-	while ESX.GetPlayerData().job == nil do
+	while ESX.GetPlayerData().job == nil and ESX.GetPlayerData() == nil do
 		Citizen.Wait(10)
 	end
-	PlayerData = ESX.GetPlayerData()
+	ESX.PlayerData = ESX.GetPlayerData()
 end)
 
 CreateThread(function()
   for _, v in pairs(Config.Garages) do
     if v.Blip then
       local blip = AddBlipForCoord(v.Coords)
-      SetBlipSprite(blip, 357)
-      SetBlipColour(blip, 3)
-      SetBlipDisplay(blip, 2)
-      SetBlipScale(blip, 0.8)
+      if v.Type == 'aircraft' then
+        SetBlipSprite(blip, 359)
+        SetBlipColour(blip, 3)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.8)
+      elseif v.Type == 'car' then
+        SetBlipSprite(blip, 357)
+        SetBlipColour(blip, 3)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.8)
+      elseif v.Type == 'boat' then
+        SetBlipSprite(blip, 356)
+        SetBlipColour(blip, 3)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.8)
+      end
       SetBlipAsShortRange(blip, true)
       BeginTextCommandSetBlipName('STRING')
       AddTextComponentSubstringPlayerName(_K('garage', v.Label))
       EndTextCommandSetBlipName(blip)
     end
+    SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Garages)
   end
 
   for _, v in pairs(Config.Impound) do
     if v.Blip then
       local blip = AddBlipForCoord(v.Coords)
-      SetBlipSprite(blip, 477)
-      SetBlipColour(blip, 51)
-      SetBlipDisplay(blip, 2)
-      SetBlipScale(blip, 0.7)
+      if v.Type == 'aircraft' then
+        SetBlipSprite(blip, 359)
+        SetBlipColour(blip, 51)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.8)
+      elseif v.Type == 'car' then
+        SetBlipSprite(blip, 477)
+        SetBlipColour(blip, 51)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.7)
+      elseif v.Type == 'boat' then
+        SetBlipSprite(blip, 356)
+        SetBlipColour(blip, 51)
+        SetBlipDisplay(blip, 2)
+        SetBlipScale(blip, 0.8)
+      end
       SetBlipAsShortRange(blip, true)
       BeginTextCommandSetBlipName('STRING')
       AddTextComponentSubstringPlayerName(_K('impound', v.Label))
       EndTextCommandSetBlipName(blip)
     end
+    SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Impound)
   end
 end)
 
 CreateThread(function()
   if Config.UseTarget then
-    for _, v in pairs(Config.Garages) do
-      SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Garages)
-    end
-
-    for _, v in pairs(Config.Impound) do
-      SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Impound)
-    end
-
     exports.ox_target:addModel(Config.Peds.Garages, {
       {
         name = 'getVehGarage',
         icon = 'fa-solid fa-car',
         label = _K('get_veh_list'),
-        event = 'kc_garage:getVehList', 'Garages',
+        onSelect = function(data)
+          for garageName, Garage in pairs(Config.Garages) do
+            if #(data.coords - Garage.Coords) < 2.0 then
+              data.type = 'Garages'
+              data.vehType = Garage.Type
+              TriggerEvent('kc_garage:getVehList', data)
+            end
+          end
+        end,
         canInteract = function(entity, distance, coords, name, bone)
           for garageName, Garage in pairs(Config.Garages) do
             if #(coords - Garage.Coords) < 2.0 then 
@@ -104,47 +129,27 @@ CreateThread(function()
         end
       },
     })
-
+    
     exports.ox_target:addModel(Config.Peds.Impound, {
       {
         name = 'getVehImpound',
         icon = 'fa-solid fa-car',
         label = _K('get_veh_list'),
-        event = 'kc_garage:getVehList', 'Impound',
+        onSelect = function(data)
+          for ImpoundName, Impound in pairs(Config.Impound) do
+            if #(data.coords - Impound.Coords) < 2.0 then
+              data.type = 'Impound'
+              data.vehType = Impound.Type
+              TriggerEvent('kc_garage:getVehList', data)
+            end
+          end
+        end,
         canInteract = function(entity, distance, coords, name, bone)
           if distance < 2.0 then return true end
         end
       },
     })
-  else
-    while true do
-      local Sleep = 2000
-      local playerCoords = GetEntityCoords(GetPlayerPed(-1))
-      for garageName, Garage in pairs(Config.Garages) do
-        if #(playerCoords - Garage.Coords) < 2.0 and HasPlayers(garageName) and HasGroups(garageName) then
-          Sleep = 0
-          DrawText3Ds(Garage.Coords.x, Garage.Coords.y, Garage.Coords.z, _K('press_get_veh'))
-          if IsControlJustReleased(0, 38) then
-            TriggerEvent('kc_garage:getVehList', 'Garages', playerCoords)
-          end
-        end
-      end
-      for _, Impound in pairs(Config.Impound) do
-        if #(playerCoords - Impound.Coords) < 2.0 then
-          Sleep = 0
-          DrawText3Ds(Impound.Coords.x, Impound.Coords.y, Impound.Coords.z, _K('press_get_veh'))
-          if IsControlJustReleased(0, 38) then
-            TriggerEvent('kc_garage:getVehList', 'Impound', playerCoords)
-          end
-        end
-      end
-      Wait(Sleep)
-    end
-  end
-end)
 
-CreateThread(function()
-  if Config.UseTarget then
     exports.ox_target:addGlobalVehicle({
       {
         name = 'storedVeh',
@@ -163,43 +168,85 @@ CreateThread(function()
       }
     })
   else
-    while true do
-      local Sleep = 2000
-      local playerCoords = GetEntityCoords(GetPlayerPed(-1))
-      local isInVehicle = IsPedInAnyVehicle(GetPlayerPed(-1), false)
-
-      if isInVehicle then
-        for garageName, Garages in pairs(Config.Garages) do
-          for i = 1, #Garages.DeletePoint do
-            if #(playerCoords - Garages.DeletePoint[i].Pos) < 2.0 and HasPlayers(garageName) and HasGroups(garageName) then
-              Sleep = 0
+    for garageName, Garage in pairs(Config.Garages) do
+      garages = lib.points.new(Garage.Coords, 3.0, {
+        type = 'Garages',
+        vehType = Garage.Type
+      })
+      function garages:nearby()
+        lib.showTextUI(_K('press_get_veh'),{
+          position = "right-center",
+          icon = 'warehouse',
+            style = {
+            borderRadius = 5,
+            backgroundColor = '#4ba9ff',
+            color = 'white'
+          }
+        })
+        if IsControlJustReleased(0, 38) then
+          TriggerEvent('kc_garage:getVehList', self, self.coords)
+        end
+      end
+      function garages:onExit()
+        lib.hideTextUI()
+      end
+      
+      for i = 1, #Garage.DeletePoint, 1 do
+        invehGarages = lib.points.new(Garage.DeletePoint[i].Pos, 10)
+        function invehGarages:nearby()
+          if IsPedInAnyVehicle(GetPlayerPed(-1), false) then
+            DrawMarker(36, self.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 255, 100, 100, 100, false, true, 2, true, false, false, false)   
+            if self.currentDistance < 2.0 then
               local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-              DrawText3Ds(Garages.DeletePoint[i].Pos.x, Garages.DeletePoint[i].Pos.y, Garages.DeletePoint[i].Pos.z , _K('press_to_parking'))
               if IsControlJustReleased(0, 38) then
-                TriggerEvent('kc_garage:saveVehicles', GetGarageName(playerCoords, 'key', 'Garages'), vehicle)
+                TriggerEvent('kc_garage:saveVehicles', GetGarageName(self.coords, 'key', 'Garages'), vehicle)
               end
             end
           end
         end
       end
-      Wait(Sleep)
+    end
+    function invehGarages:onExit()
+      lib.hideTextUI()
+    end
+    
+    for _, Impound in pairs(Config.Impound) do
+      impounds = lib.points.new(Impound.Coords, 3.0)
+      function impounds:nearby()
+        lib.showTextUI(_K('press_get_veh'),{
+          position = "right-center",
+          icon = 'warehouse',
+          style = {
+            borderRadius = 5,
+            backgroundColor = '#4ba9ff',
+            color = 'white'
+          }
+        })
+        if IsControlJustReleased(0, 38) then
+          TriggerEvent('kc_garage:getVehList', 'Impound', self.coords)
+          lib.hideTextUI()
+        end
+      end
+      function impounds:onExit()
+        lib.hideTextUI()
+      end
     end
   end
 end)
 
 RegisterNetEvent("esx:setJob")
 AddEventHandler("esx:setJob", function(job)
-  PlayerData.job = job
+  ESX.PlayerData.job = job
 end)
 
 RegisterNetEvent('kc_garage:notify')
-AddEventHandler('kc_garage:notify', function(type, args)
+AddEventHandler('kc_garage:notify', function(_type, args)
   if Config.Notify == 'mythic_notify' then
-    exports['mythic_notify']:DoHudText(type, args)
+    exports['mythic_notify']:DoHudText(_type, args)
   elseif Config.Notify == 'lib' then
     lib.notify({
       description = args,
-      type = type
+      type = _type
     })
   elseif Config.Notify == 'ESX' then
     ESX.ShowNotification(args)
@@ -207,46 +254,49 @@ AddEventHandler('kc_garage:notify', function(type, args)
 end)
 
 RegisterNetEvent('kc_garage:getVehList')
-AddEventHandler('kc_garage:getVehList', function(type, playerCoords)
+AddEventHandler('kc_garage:getVehList', function(data, playerCoords)
   local stored = 1
-
+  local icons = 'car-side'
+  
   if not playerCoords then
-    playerCoords = type.coords
-    type = type[1]
+    playerCoords = data.coords
   end
 
-  if type == 'Impound' then
+  if data.type == 'Impound' then
     stored = 0
   end
-  
+
   ESX.TriggerServerCallback('kc_garage:getVehiclesInParking', function(vehicles)
     local vehiclesTableList = {}
     if vehicles then
       for i = 1, #vehicles, 1 do
-        local engineHealth = vehicles[i].vehicle.engineHealth * 100 / 1000
-        local bodyHealth = vehicles[i].vehicle.bodyHealth * 100 / 1000
-        if #(playerCoords - Config[type][vehicles[i].parking].Coords) < 3.0 then
-          vehiclesTableList[GetDisplayNameFromVehicleModel(vehicles[i].vehicle.model)] = {
-            description = _K('engine')..engineHealth..'% | '.._K('body')..bodyHealth..'% | '.._K('fuel')..vehicles[i].vehicle.fuelLevel.. '%',
-            event = 'kc_garage:spawnVehicle',
-            args = {
-              type = type,
-              parking = vehicles[i].parking,
-              vehicle = vehicles[i].vehicle,
-            },
-            metadata = {
-              [_K('parking')] = Config[type][vehicles[i].parking].Label, 
-              [_K('plate')] = vehicles[i].plate,
-              [_K('fee')] = Config.VehicleFee[type][GetVehicleClassFromName(vehicles[i].vehicle.model)],
-              [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehicles[i].vehicle.model)]
+        if vehicles[i].vehType == Config[data.type][vehicles[i].parking].Type and vehicles[i].vehType == data.vehType then
+          local engineHealth = vehicles[i].vehicle.engineHealth * 100 / 1000
+          local bodyHealth = vehicles[i].vehicle.bodyHealth * 100 / 1000
+          if #(playerCoords - Config[data.type][vehicles[i].parking].Coords) < 3.0 then
+            vehiclesTableList[GetDisplayNameFromVehicleModel(vehicles[i].vehicle.model)] = {
+              description = _K('engine')..engineHealth..'% | '.._K('body')..bodyHealth..'% | '.._K('fuel')..vehicles[i].vehicle.fuelLevel.. '%',
+              event = 'kc_garage:spawnVehicle',
+              icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehicles[i].vehicle.model)]),
+              args = {
+                type = data.type,
+                parking = vehicles[i].parking,
+                vehicle = vehicles[i].vehicle,
+              },
+              metadata = {
+                [_K('parking')] = Config[data.type][vehicles[i].parking].Label, 
+                [_K('plate')] = vehicles[i].plate,
+                [_K('fee')] = Config.VehicleFee[data.type][GetVehicleClassFromName(vehicles[i].vehicle.model)],
+                [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehicles[i].vehicle.model)]
+              }
             }
-          }
-          ParkingName = Config[type][vehicles[i].parking].Label
+            ParkingName = Config[data.type][vehicles[i].parking].Label
+          end
         end
       end
       lib.registerContext({
         id = 'garage_menu',
-        title = GetGarageName(playerCoords, 'label', type).. ' ' ..type,
+        title = GetGarageName(playerCoords, 'label', data.type).. ' ' ..data.type,
         options = vehiclesTableList
       })
       lib.showContext('garage_menu')
@@ -270,7 +320,7 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
         ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
           ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
           
-          if Config.TeleportToVehicle then
+          if Config.TeleportToVehicle or Config[data.type][data.parking].Type == 'boat' then
             TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
             SetVehicleEngineOn(vehicle, true, true)
           end
@@ -405,6 +455,22 @@ AddEventHandler("kc_garage:deleteVehicle", function()
 	end
 end)
 
+function GetIcons(vehClass)
+  if vehClass == 'Motorcycles' then
+    return 'motorcycle'
+  elseif vehClass == 'Cylces' then
+    return 'bicycle'
+  elseif vehClass == 'Boats' then
+    return 'ship'
+  elseif vehClass == 'Helicopters' then
+    return 'helicopter'
+  elseif vehClass == 'Planes'then
+    return 'plane'
+  else
+    return 'car-side'
+  end
+end
+
 function GetAvailableVehicleSpawnPoint(spawnPoints)
 	local found, foundSpawnPoint = false, nil
 
@@ -442,8 +508,8 @@ function WaitForVehicleToLoad(modelHash)
 	end
 end
 
-function GetGarageName(playerCoords, type, value)
-  if type == 'key' then
+function GetGarageName(playerCoords, _type, value)
+  if _type == 'key' then
     for Garage, v in pairs(Config[value]) do
       for i = 1, #v.DeletePoint do
         if #(playerCoords - v.DeletePoint[i].Pos) < 3.0 then
@@ -451,7 +517,7 @@ function GetGarageName(playerCoords, type, value)
         end
       end
     end
-  elseif type == 'label' then
+  elseif _type == 'label' then
     for _, v in pairs(Config[value]) do
       if #(playerCoords - v.Coords) < 3.0 then
         return v.Label
@@ -465,7 +531,7 @@ function HasPlayers(garage)
   if players then
     for i = 1, #players, 1 do
       local Player = players[i]
-      if PlayerData.identifier == Player then
+      if ESX.PlayerData.identifier == Player then
         return true
       end
     end
@@ -479,7 +545,7 @@ function HasGroups(garage)
   if Groups then
     for i = 1, #Groups, 1 do
       local Group = Groups[i]
-      if PlayerData.job.name == Group then
+      if ESX.PlayerData.job.name == Group then
         return true
       end
     end
@@ -501,20 +567,6 @@ function SpawnNpc(coords, heading, model)
   FreezeEntityPosition(ped, true)
   SetEntityInvincible(ped, true)
   SetBlockingOfNonTemporaryEvents(ped, true)
-end
-
-function DrawText3Ds(x, y, z, text)
-    local onScreen, _x, _y = World3dToScreen2d(x, y, z)
-    SetTextScale(0.32, 0.32)
-    SetTextFont(4)
-    SetTextProportional(1)
-    SetTextColour(255, 255, 255, 255)
-    SetTextEntry("STRING")
-    SetTextCentre(1)
-    AddTextComponentString(text)
-    DrawText(_x, _y)
-    local factor = (string.len(text)) / 500
-    DrawRect(_x, _y + 0.0125, 0.015 + factor, 0.03, 0, 0, 0, 80)
 end
 
 function EnumerateEntities(initFunc, moveFunc, disposeFunc)
