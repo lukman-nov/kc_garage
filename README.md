@@ -1,29 +1,41 @@
 <div align="center">
 <img src="https://media.discordapp.net/attachments/901446802711142460/1060136243377229874/KC.png" width="30%">
 <h1><b>KUCLUCK GARAGE</b></h1>
-Kucluck Garage only support for ESX Legacy. I test on ESX Legacy v1.9.3 and use Game Build 2802, if this resouce error or not working, try use it.
+<p>Kucluck Garages, this is a garage script that has many functions. Starting from the garage of cars, planes or helicopters, and boats, it can also be used to seize vehicles manually or automatically using a predetermined time, and there is also a vehicle lock system. This garage can also be made into private garages, jobs or groups of garages or public garages.
+
+This script is only useful in the ESX Legacy framework, because when I made this script I used the <b>ESX Legacy 1.9.3</b> framework and <b>Game build 2802</b>.
+
+Sorry if this script looks bad :D
+Hopefully this script is useful for those of you who download it.
+
+I share this script with you for free.
+
+## <b>⚠️ !!! DO NOT TRADE THIS SCRIPT !!! ⚠️</b>
+
+</p>
 </div>
 
 <div align="center">
-<img src="https://media.discordapp.net/attachments/1060165701136044052/1078453434270883920/20230224060842_1.jpg">
+<img src="https://media.discordapp.net/attachments/1060165701136044052/1087293000155152384/20230320153341_1.jpg">
 
 <br>
-<img src="https://media.discordapp.net/attachments/1060165701136044052/1078453117517037578/20230224060722_1.jpg">
+<img src="https://media.discordapp.net/attachments/1060165701136044052/1087293294867927061/20230320153509_1.jpg">
 </div>
 
 <br>
 
 ### ✅ Main Features
 
-- Low Resmon.
-- Save Engine Level, Body Level, Fuel Level, Visual Dirt Body, and Visual Damage.
+- Low Resmon (_if you use ox_target_).
+- Save Engine Level, Body Level, Fuel Level, Visual Dirt Body and etc.
 - Include database, and NPC.
-- Include Car key System.
+- Include vehicles key System.
 - Include Impound and Jobs Impounded.
-- Include Private Garage and Jobs Garage
+- Include Private Garage and Jobs Garage.
+- Incluce cars, planes or helicopters, and boats Garage & Impound,
 - Custom Fee Impound & Fee Garages from vehicle type.
 - Include Auto and Manualy Delete Vehicles in Words.
-- Free Update.
+- And more 😄
 
 ### ⚙️ Framework
 
@@ -38,13 +50,47 @@ Kucluck Garage only support for ESX Legacy. I test on ESX Legacy v1.9.3 and use 
 - <a href='https://github.com/JayMontana36/mythic_notify'>mythic_notify</a>
 - <a href='https://github.com/overextended/ox_target'>ox_target</a>
 
-### Usage
+### 🧰 Usage
 
 ```lua
 exports['kc_garage']:JobsImpound('ImpoundName', VehiclePlate, VehiclePropertis, ESX.PlayerData.identifier)
 ```
 
 `ImpoundName` must be the same as the one in `Config.Impound[ImpoundName]`
+
+```lua
+Config.Garages = {
+  Legion = { -- key garages to input databases
+    Label = 'Legion', -- garage label
+    Type = 'car', -- 'car', 'aircraft' and 'boat'
+    Blip = true, -- if private garages you can set false
+    NotFree = true, -- fee garages
+    Coords = vector3(214.6728, -806.7095, 30.8073), -- blips and ped coords
+    PedHeading = 337.9022, -- ped heading
+    Players = { -- Players table allowed to access garages
+      -- ex: {'steam:xxxxxxxxxxxx'}
+    },
+    Groups = { -- Groups table allowed to access garages
+      -- ex: {'police'}
+    },
+    SpawnPoint = {
+      { Pos = vector3(221.3627, -809.6945, 30.1290), Heading = 248.5339 },
+      { Pos = vector3(221.9424, -807.0797, 30.1476), Heading = 248.5339 },
+      { Pos = vector3(222.7534, -804.3437, 30.1486), Heading = 248.5339 },
+      { Pos = vector3(223.8556, -801.9759, 30.1351), Heading = 248.5339 },
+      { Pos = vector3(224.4868, -799.4138, 30.1383), Heading = 248.5339 },
+      { Pos = vector3(225.3986, -796.8544, 30.1434), Heading = 248.5339 },
+    },
+    DeletePoint = {
+      { Pos = vector3(206.0533, -800.8460, 30.9834) },
+      { Pos = vector3(206.8243, -798.4073, 30.9834) },
+      { Pos = vector3(207.7707, -796.0760, 30.9834) },
+      { Pos = vector3(209.2426, -793.8544, 30.9834) },
+      { Pos = vector3(210.0643, -791.2812, 30.9834) },
+    }
+  },
+}
+```
 
 <hr>
 
