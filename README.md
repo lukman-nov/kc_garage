@@ -41,7 +41,7 @@ I share this script with you for free.
 
 - ESX
 
-### 🛠 Requirements
+### ⚠️ Requirements
 
 - <a href='https://github.com/overextended/ox_lib'>ox_lib</a>
 
@@ -90,6 +90,20 @@ Config.Garages = {
     }
   },
 }
+```
+
+## 🛠️ <b> How To Fix NULL Vehicle Label</b>
+
+<div align="center"><img src="https://media.discordapp.net/attachments/1060165701136044052/1087603093962772541/image.png"/></div>
+
+To fix NULL vehicle names when selecting a vehicle you need to add code in vehicle_names.lua for ex: `AddTextEntry('23rs7', 'AUDI RS7 2023')` the first is `<gameName>` and the second is the vehicle's custom Label. to get `<gameName>` you need to look at the vehicle data in `vehicles.meta`.
+
+<div align="center"><img src="https://media.discordapp.net/attachments/1060165701136044052/1087603452181487716/image.png"/></div>
+
+```lua
+CreateThread(function()
+  AddTextEntry('23rs7', "AUDI RS7 2023") -- (<gameName>, Vehicle Label)
+end)
 ```
 
 <hr>
