@@ -7,7 +7,7 @@ description 'KC Garage'
 repository 'https://github.com/lukman-nov/kc_garage'
 
 lua54 'yes'
-version '2.1.0'
+version '2.2.0'
 
 shared_scripts {
 	'@ox_lib/init.lua',
