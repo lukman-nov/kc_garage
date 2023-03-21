@@ -1,18 +1,21 @@
 Config = {}
-Config.CheckForUpdates = true
-Config.Locale = 'en'
-Config.UseTarget = true
+Config.CheckForUpdates = true  -- check for update available?
+Config.Locale = 'en'  -- 'en' or 'id'
+Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 
-Config.AutoTeleportToVehicle = false
-Config.AutoLockVeh = true
+Config.AutoTeleportToVehicle = false -- auto teleport to vehicle if vehicle spawning
+Config.AutoLockVeh = true -- auto lock to vehicle if vehicle spawning
+Config.PayIn = 'money' -- Player can pay vehicle fee with 'money' or 'bank'
+Config.LockKeyVehicle = 'U' -- https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
 
-Config.CmdVehDelete = 'asuransi'
+Config.CmdVehDelete = 'asuransi' -- Admin command for delete vehicle in the words
+Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 80 config.lua
 Config.DeleteVehicleTimer = 180 -- in second
-Config.DeleteVehiclesIfInSafeZone = true
-Config.PayIn = 'money' -- 'money' = cash, 'bank' = bank
-Config.VehicleFee = { -- Set 0 for free
-  Garages = {
+Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 91 config.lua
+
+Config.VehicleFee = { -- if set to 0 the player does not pay
+  Garages = { -- Garage Fee
     [0] = 5000, -- Compacts
     [1] = 5000, -- Sedans
     [2] = 5000, -- SUVs
@@ -36,7 +39,7 @@ Config.VehicleFee = { -- Set 0 for free
     [20] = 5000, -- Commercial
     [21] = 5000 -- Train 
   },
-  Impound = {
+  Impound = { -- Impound Fee
     [0] = 15000, -- Compacts
     [1] = 15000, -- Sedans
     [2] = 15000, -- SUVs
@@ -62,19 +65,19 @@ Config.VehicleFee = { -- Set 0 for free
   }
 }
 
-Config.Peds = {
+Config.Peds = { -- Peds List
   Garages = 'CSB_TrafficWarden',
   Impound = 's_m_y_construct_01'
 }
 
-Config.GroupAllowed = {
+Config.GroupAdminList= { -- Admin list to use Config.CmdVehDelete
   'dev',
   'moderator',
   'headadmin',
   'admin',
 }
 
-Config.DeleteVehiclesAt = {
+Config.DeleteVehiclesAt = { -- Automatic clock setting to delete or impound vehicles if there is no player inside.
 	{['h'] = 00, ['m'] = 00},
 	{['h'] = 03, ['m'] = 00},
 	{['h'] = 06, ['m'] = 00},
@@ -85,13 +88,13 @@ Config.DeleteVehiclesAt = {
 	{['h'] = 21, ['m'] = 00},
 }
 
-Config.SafeZones = {
+Config.SafeZones = { -- If the vehicle is within the safe zone, it will not be deleted.
 	{ ['x'] = -44.155646565, ['y'] = -1100.155646565, ['z'] = 26.267009735108, ['radius'] = 50.0},
 	{ ['x'] = -1688.43811035156, ['y'] = -1073.62536621094, ['z'] = 13.1521873474121, ['radius'] = 200.0},
 	{ ['x'] = -2195.1352539063, ['y'] = 4288.7290039063, ['z'] = 49.173923492432, ['radius'] = 150.0},
 }
 
-Config.Garages = {
+Config.Garages = { -- Garages Config
   Legion = { -- key garages to input databases
     Label = 'Legion', -- garage label
     Type = 'car', -- 'car', 'aircraft' and 'boat'
@@ -447,7 +450,7 @@ Config.Garages = {
 
 }
 
-Config.Impound = {
+Config.Impound = { -- Impound Config
 	SandyShores = {
 		Label = 'Sandy Shores',
     Type = 'car',
