@@ -789,7 +789,7 @@ function JobsImpound(impoundLoc, plate, vehicleProps, identifier)
 end
 
 -- Commands
-RegisterKeyMapping('lockvehicle', 'Toggle vehicle locks', 'keyboard', 'U')
+RegisterKeyMapping('lockvehicle', 'Toggle vehicle locks', 'keyboard', Config.LockKeyVehicle)
 RegisterCommand('lockvehicle', function()
   local vehicle, dist = ESX.Game.GetClosestVehicle()
 
