@@ -76,6 +76,7 @@ RegisterServerEvent('kc_garage:updateOwnedVehicle')
 AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, vehicleProps)
 	local src = source
 	local xPlayer  = ESX.GetPlayerFromId(src)
+
 	MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `vehicle` = @vehicle WHERE `plate` = @plate AND `owner` = @identifier',
 	{
 		['@identifier'] = xPlayer.identifier,
@@ -83,6 +84,14 @@ AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, vehicl
 		['@plate'] 		= vehicleProps.plate,
 		['@stored']     = stored,
 		['@parking']    = parking,
+	})
+end)
+
+RegisterNetEvent('kc_garage:updateVehicleProperties', function(plate, vehicleProps)
+	MySQL.update('UPDATE owned_vehicles SET `vehicle` = @vehicle WHERE `plate` = @plate',
+	{
+		['@vehicle'] 	= json.encode(vehicleProps),
+		['@plate'] 		= vehicleProps.plate,
 	})
 end)
 
@@ -185,26 +194,31 @@ AddEventHandler('kc_garage:giveKeyToPerson', function(target, plate)
 	end
 end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-  if (GetCurrentResourceName() ~= resourceName) then return end
-	MySQL.query('SELECT type FROM `owned_vehicles` WHERE parking IS NULL',{ 
-	}, function(result)
-		if result then
-			for i = 1, #result, 1 do
-				local tempType = result[i].type
-				if tempType == 'helicopter' or tempType == 'airplane'then
-					tempType = 'aircraft'
-				end
-				for impoundName, impound in pairs(Config.Impound) do
-					if tempType == impound.Type then
-						if impound.IsDefaultImpound then
-							TriggerEvent('kc_garage:impoundVehicle', impoundName, result[i].type)
+RegisterNetEvent('kc_garage:filterVehiclesType')
+AddEventHandler('kc_garage:filterVehiclesType', function()
+	MySQL.query('SELECT `type`, `vehicle` FROM `owned_vehicles` WHERE parking IS NULL',{ 
+		}, function(result)
+			if result then
+				for i = 1, #result, 1 do
+					local tempType = result[i].type
+					if tempType == 'helicopter' or tempType == 'airplane'then
+						tempType = 'aircraft'
+					end
+					for impoundName, impound in pairs(Config.Impound) do
+						if tempType == impound.Type then
+							if impound.IsDefaultImpound then
+								TriggerEvent('kc_garage:impoundVehicle', impoundName, result[i].type)
+							end
 						end
 					end
 				end
 			end
-		end
-	end)
+		end)
+end)
+
+AddEventHandler('onResourceStart', function(resourceName)
+  if (GetCurrentResourceName() ~= resourceName) then return end
+	TriggerEvent('kc_garage:filterVehiclesType')
 end)
 
 function DeleteVehTaskCoroutine()
