@@ -52,8 +52,8 @@ end)
 
 ESX.RegisterServerCallback('kc_garage:getPlayersGroup', function(source, cb)
 	local xPlayer = ESX.GetPlayerFromId(source)
-	for i = 1, #Config.GroupAllowed, 1 do
-		if xPlayer.getGroup() == Config.GroupAllowed[i] then
+	for i = 1, #Config.GroupAdminList, 1 do
+		if xPlayer.getGroup() == Config.GroupAdminList[i] then
 			cb(true)
 		end
 	end
@@ -221,10 +221,12 @@ AddEventHandler('onResourceStart', function(resourceName)
 	TriggerEvent('kc_garage:filterVehiclesType')
 end)
 
-function DeleteVehTaskCoroutine()
-  TriggerClientEvent('kc_garage:deleteVehicle', -1)
-end
+if Config.AutoDelVeh then
+	function DeleteVehTaskCoroutine()
+		TriggerClientEvent('kc_garage:deleteVehicle', -1)
+	end
 
-for i = 1, #Config.DeleteVehiclesAt, 1 do
-	TriggerEvent('cron:runAt', Config.DeleteVehiclesAt[i].h, Config.DeleteVehiclesAt[i].m, DeleteVehTaskCoroutine)
+	for i = 1, #Config.DeleteVehiclesAt, 1 do
+		TriggerEvent('cron:runAt', Config.DeleteVehiclesAt[i].h, Config.DeleteVehiclesAt[i].m, DeleteVehTaskCoroutine)
+	end
 end
