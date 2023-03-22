@@ -19,7 +19,8 @@ I share this script with you for free.
 <a href="https://youtu.be/sb_Y4lud-IM"><img src="https://media.discordapp.net/attachments/1060165701136044052/1088129652104634388/kc_garage.png"></a>
 </div>
 
-<br>
+
+### 📺 [Preview](https://youtu.be/sb_Y4lud-IM)
 
 ### ✅ Main Features
 
