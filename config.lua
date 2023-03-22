@@ -3,6 +3,7 @@ Config.CheckForUpdates = true  -- check for update available?
 Config.Locale = 'en'  -- 'en' or 'id'
 Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
+Config.UseAnim = false -- Required rpemotes
 
 Config.AutoTeleportToVehicle = false -- auto teleport to vehicle if vehicle spawning
 Config.AutoLockVeh = true -- auto lock to vehicle if vehicle spawning
@@ -10,9 +11,9 @@ Config.PayIn = 'money' -- Player can pay vehicle fee with 'money' or 'bank'
 Config.LockKeyVehicle = 'U' -- https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
 
 Config.CmdVehDelete = 'asuransi' -- Admin command for delete vehicle in the words
-Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 80 config.lua
-Config.DeleteVehicleTimer = 180 -- in second
-Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 91 config.lua
+Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 81 config.lua
+Config.DeleteVehicleTimer = 2 -- in second
+Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 92 config.lua
 
 Config.VehicleFee = { -- if set to 0 the player does not pay
   Garages = { -- Garage Fee
@@ -66,8 +67,8 @@ Config.VehicleFee = { -- if set to 0 the player does not pay
 }
 
 Config.Peds = { -- Peds List
-  Garages = 'CSB_TrafficWarden',
-  Impound = 's_m_y_construct_01'
+  'CSB_TrafficWarden', -- Garages
+  's_m_y_construct_01' -- Impounds
 }
 
 Config.GroupAdminList= { -- Admin list to use Config.CmdVehDelete
@@ -100,8 +101,8 @@ Config.Garages = { -- Garages Config
     Type = 'car', -- 'car', 'aircraft' and 'boat'
     Blip = true, -- if private garages you can set false
     NotFree = true, -- fee garages
-    Coords = vector3(214.6728, -806.7095, 30.8073), -- blips and ped coords
-    PedHeading = 337.9022, -- ped heading
+    Coords = vector3(215.4945, -808.5418, 30.7593), -- blips and ped coords
+    PedHeading = 249.1711, -- ped heading
     Players = { -- Players table allowed to access garages
       -- ex: {'steam:xxxxxxxxxxxx'}
     },
@@ -109,19 +110,21 @@ Config.Garages = { -- Garages Config
       -- ex: {'police'}
     },
     SpawnPoint = {
-      { Pos = vector3(221.3627, -809.6945, 30.1290), Heading = 248.5339 },
-      { Pos = vector3(221.9424, -807.0797, 30.1476), Heading = 248.5339 },
       { Pos = vector3(222.7534, -804.3437, 30.1486), Heading = 248.5339 },
       { Pos = vector3(223.8556, -801.9759, 30.1351), Heading = 248.5339 },
       { Pos = vector3(224.4868, -799.4138, 30.1383), Heading = 248.5339 },
       { Pos = vector3(225.3986, -796.8544, 30.1434), Heading = 248.5339 },
+      { Pos = vector3(225.7808, -794.0939, 30.1681), Heading = 249.2099 },
+      { Pos = vector3(226.4725, -791.5930, 30.1775), Heading = 248.3668 },
+      { Pos = vector3(227.9673, -789.1436, 30.1805), Heading = 248.0247 },
     },
     DeletePoint = {
-      { Pos = vector3(206.0533, -800.8460, 30.9834) },
-      { Pos = vector3(206.8243, -798.4073, 30.9834) },
       { Pos = vector3(207.7707, -796.0760, 30.9834) },
       { Pos = vector3(209.2426, -793.8544, 30.9834) },
       { Pos = vector3(210.0643, -791.2812, 30.9834) },
+      { Pos = vector3(210.9966, -788.7125, 30.4128) },
+      { Pos = vector3(211.4733, -785.8821, 30.4111) },
+      { Pos = vector3(212.6457, -783.4863, 30.3930) },
     }
   },
 
