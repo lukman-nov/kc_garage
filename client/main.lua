@@ -1,6 +1,7 @@
 local ESX = nil
 local MDI = 50
 local DDT = 0.05
+local inAnim = false
 
 local vehicleClassName = {
   [0] = 'Compacts',
@@ -122,9 +123,7 @@ CreateThread(function() -- ox_target Get and Save Vehicle
               data.parkingLabel = garageName
               data.NotFree = garage.NotFree
               data.spawnPoints = garage.SpawnPoint
-              if Config.UseAnim then
-                exports["rpemotes"]:EmoteCommandStart('tablet2')
-              end
+              PlayAnim(Config.UseAnim)
               GetVehList(data)
             end
           end
@@ -150,9 +149,7 @@ CreateThread(function() -- ox_target Get and Save Vehicle
               data.parkingLabel = impoundName
               data.NotFree = impound.NotFree
               data.spawnPoints = impound.SpawnPoint
-              if Config.UseAnim then
-                exports["rpemotes"]:EmoteCommandStart('tablet2')
-              end
+              PlayAnim(Config.UseAnim)
               GetVehList(data)
             end
           end
@@ -203,9 +200,7 @@ CreateThread(function() -- not ox_target Get and Save Vehicle
           tempData.NotFree = garage.NotFree
           ESX.Game.Utils.DrawText3D(vector3(garage.Coords.x, garage.Coords.y, garage.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
           if IsControlJustReleased(0, 38) then
-            if Config.UseAnim then
-              exports["rpemotes"]:EmoteCommandStart('tablet2')
-            end
+            PlayAnim(Config.UseAnim)
             GetVehList(tempData, playerCoords)
             tempData = {}
           end
@@ -240,9 +235,7 @@ CreateThread(function() -- not ox_target Get and Save Vehicle
         ESX.Game.Utils.DrawText3D(vector3(impound.Coords.x, impound.Coords.y, impound.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
         
         if IsControlJustReleased(0, 38) then
-          if Config.UseAnim then
-            exports["rpemotes"]:EmoteCommandStart('tablet2')
-          end
+          PlayAnim(Config.UseAnim)
           GetVehList(tempData, playerCoords)
           tempData = {}
         end
@@ -344,7 +337,7 @@ AddEventHandler("kc_garage:deleteAllVehicles", function()
   local minutesPassed = 0
   local minutesLeft = Config.DeleteVehicleTimer
 
-  TriggerEvent('kc_garage:notify', 'warning', _K('del_veh_msg', minutesLeft))
+  TriggerEvent('kc_garage:notify', 'inform', _K('del_veh_msg', minutesLeft))
 
   while minutesPassed < Config.DeleteVehicleTimer do
     Citizen.Wait(1*minuteCalculation)
@@ -419,7 +412,7 @@ function GetVehList(data)
       title = GetGarageName(GetEntityCoords(GetPlayerPed(-1)), 'label', data.type).. ' ' ..data.type,
       options = vehicleList,
       onExit = function()
-        exports["rpemotes"]:EmoteCancel(true)
+        PlayAnim(Config.UseAnim)
       end
     })
     lib.showContext('kc_garage:openVehicleListMenu')
@@ -431,7 +424,8 @@ function spawnVehicle(data)
 
   if foundSpawn then
     WaitForVehicleToLoad(data.vehicle.model)
-    exports["rpemotes"]:EmoteCancel(true)
+    PlayAnim(Config.UseAnim)
+
     ESX.TriggerServerCallback('kc_garage:checkMoney', function(playerMoney)
       if playerMoney >= data.price then
 
@@ -790,6 +784,40 @@ function GetGarageLabel(key)
     if key == garageName then
       label = garage.Label
       return label
+    end
+  end
+end
+
+function PlayAnim(useAnim)
+  if useAnim then
+    SetPedCurrentWeaponVisible(GetPlayerPed(-1), 0, 1, 1, 1)
+    local dict = 'amb@code_human_in_bus_passenger_idles@female@tablet@idle_a'
+    local prop = 'prop_cs_tablet'
+    
+    while not HasModelLoaded(prop) do
+        RequestModel(prop)
+        Wait(10)
+    end
+    
+    if not inAnim then
+      inAnim = true
+
+      while not HasAnimDictLoaded(dict) do
+        RequestAnimDict(dict)
+        Citizen.Wait(10)
+      end
+      
+      TaskPlayAnim(GetPlayerPed(-1), dict, 'idle_a', 8.0, 8.0, -1, 49, 0.0, 0, 0, 0)
+      local x,y,z = table.unpack(GetEntityCoords(GetPlayerPed(-1)))
+      local entityProp = CreateObject(GetHashKey(prop), x, y, z + 0.2,  true,  true, true)
+      AttachEntityToEntity(entityProp, GetPlayerPed(-1), GetPedBoneIndex(GetPlayerPed(-1), 28422), -0.05, 0.00, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+
+    else
+      inAnim = false
+      local entityProp = GetClosestObjectOfType(GetEntityCoords(GetPlayerPed(-1)), 1.0, GetHashKey(prop), false, 0, 0)
+      DeleteEntity(entityProp)
+      ClearPedTasks(GetPlayerPed(-1))
+      SetPedCurrentWeaponVisible(GetPlayerPed(-1), 1, 1, 1, 1)
     end
   end
 end
