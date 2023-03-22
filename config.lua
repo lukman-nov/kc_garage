@@ -3,7 +3,7 @@ Config.CheckForUpdates = true  -- check for update available?
 Config.Locale = 'en'  -- 'en' or 'id'
 Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
-Config.UseAnim = false -- Required rpemotes
+Config.UseAnim = true -- play animation when requesting vehicle list?
 
 Config.AutoTeleportToVehicle = false -- auto teleport to vehicle if vehicle spawning
 Config.AutoLockVeh = true -- auto lock to vehicle if vehicle spawning
@@ -12,7 +12,7 @@ Config.LockKeyVehicle = 'U' -- https://docs.fivem.net/docs/game-references/input
 
 Config.CmdVehDelete = 'asuransi' -- Admin command for delete vehicle in the words
 Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 81 config.lua
-Config.DeleteVehicleTimer = 2 -- in second
+Config.DeleteVehicleTimer = 180 -- in second
 Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 92 config.lua
 
 Config.VehicleFee = { -- if set to 0 the player does not pay
