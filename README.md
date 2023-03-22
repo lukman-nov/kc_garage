@@ -16,10 +16,7 @@ I share this script with you for free.
 </div>
 
 <div align="center">
-<img src="https://media.discordapp.net/attachments/1060165701136044052/1087293000155152384/20230320153341_1.jpg">
-
-<br>
-<img src="https://media.discordapp.net/attachments/1060165701136044052/1087293294867927061/20230320153509_1.jpg">
+<a href="https://youtu.be/sb_Y4lud-IM"><img src="https://media.discordapp.net/attachments/1060165701136044052/1088129652104634388/kc_garage.png"></a>
 </div>
 
 <br>
