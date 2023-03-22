@@ -66,7 +66,6 @@ end)
 
 RegisterNetEvent('kc_garage:removeMoney')
 AddEventHandler('kc_garage:removeMoney', function(amount)
-
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
 	xPlayer.removeAccountMoney(Config.PayIn, amount)
@@ -87,7 +86,22 @@ AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, vehicl
 	})
 end)
 
-RegisterNetEvent('kc_garage:updateVehicleProperties', function(plate, vehicleProps)
+RegisterNetEvent('kc_garage:updateStoredVehicle')
+AddEventHandler('kc_garage:updateStoredVehicle', function(stored, parking, plate)
+	local src = source
+	local xPlayer  = ESX.GetPlayerFromId(src)
+	
+	MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking WHERE `plate` = @plate AND `owner` = @identifier',
+	{
+		['@identifier'] = xPlayer.identifier,
+		['@plate'] 			= plate,
+		['@parking']		= parking,
+		['@stored']  		= stored,
+	})
+end)
+
+RegisterServerEvent('kc_garage:updateVehicleProperties')
+AddEventHandler('kc_garage:updateVehicleProperties', function(plate, vehicleProps)
 	MySQL.update('UPDATE owned_vehicles SET `vehicle` = @vehicle WHERE `plate` = @plate',
 	{
 		['@vehicle'] 	= json.encode(vehicleProps),
@@ -223,7 +237,7 @@ end)
 
 if Config.AutoDelVeh then
 	function DeleteVehTaskCoroutine()
-		TriggerClientEvent('kc_garage:deleteVehicle', -1)
+		TriggerClientEvent('kc_garage:deleteAllVehicles', -1)
 	end
 
 	for i = 1, #Config.DeleteVehiclesAt, 1 do
