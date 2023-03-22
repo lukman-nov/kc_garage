@@ -54,6 +54,7 @@ I share this script with you for free.
 
 ```lua
 exports['kc_garage']:JobsImpound('ImpoundName', VehiclePlate, VehiclePropertis, ESX.PlayerData.identifier)
+exports['kc_garage']:GetGarageLabel(db.parking) -- maybe you need xD
 ```
 
 `ImpoundName` must be the same as the one in `Config.Impound[ImpoundName]`
