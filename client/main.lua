@@ -50,7 +50,7 @@ CreateThread(function() -- Framework
 	ESX.PlayerData = ESX.GetPlayerData()
 end)
 
-CreateThread(function() -- Create Blips
+CreateThread(function() -- Create Blips And Spawn Peds
   for _, v in pairs(Config.Garages) do
     if v.Blip then
       local blip = AddBlipForCoord(v.Coords)
@@ -75,7 +75,7 @@ CreateThread(function() -- Create Blips
       AddTextComponentSubstringPlayerName(_K('garage', v.Label))
       EndTextCommandSetBlipName(blip)
     end
-    SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Garages)
+    SpawnNpc(v.Coords, v.PedHeading, Config.Peds[1])
   end
 
   for _, v in pairs(Config.Impound) do
@@ -102,53 +102,65 @@ CreateThread(function() -- Create Blips
       AddTextComponentSubstringPlayerName(_K('impound', v.Label))
       EndTextCommandSetBlipName(blip)
     end
-    SpawnNpc(v.Coords, v.PedHeading, Config.Peds.Impound)
+    SpawnNpc(v.Coords, v.PedHeading, Config.Peds[2])
   end
 end)
 
-CreateThread(function() -- Get and Save Vehicle
+CreateThread(function() -- ox_target Get and Save Vehicle
   if Config.UseTarget then
-    exports.ox_target:addModel(Config.Peds.Garages, {
+    exports.ox_target:addModel(Config.Peds, {
       {
         name = 'getVehGarage',
         icon = 'fa-solid fa-car',
         label = _K('get_veh_list'),
         onSelect = function(data)
-          for garageName, Garage in pairs(Config.Garages) do
-            if #(data.coords - Garage.Coords) < 2.0 then
+          for garageName, garage in pairs(Config.Garages) do
+            if #(data.coords - garage.Coords) < 2.0 then
               data.type = 'Garages'
-              data.vehType = Garage.Type
+              data.vehType = garage.Type
+              data.stored = 1
+              data.parkingLabel = garageName
+              data.NotFree = garage.NotFree
+              data.spawnPoints = garage.SpawnPoint
+              if Config.UseAnim then
+                exports["rpemotes"]:EmoteCommandStart('tablet2')
+              end
               GetVehList(data)
             end
           end
         end,
         canInteract = function(entity, distance, coords, name, bone)
-          for garageName, Garage in pairs(Config.Garages) do
-            if #(coords - Garage.Coords) < 2.0 then 
+          for garageName, garage in pairs(Config.Garages) do
+            if #(coords - garage.Coords) < 2.0 then 
               if distance < 2.0 and HasPlayers(garageName) and HasGroups(garageName) then return true end
             end
           end
-          
         end
       },
-    })
-    
-    exports.ox_target:addModel(Config.Peds.Impound, {
       {
         name = 'getVehImpound',
         icon = 'fa-solid fa-car',
         label = _K('get_veh_list'),
         onSelect = function(data)
-          for ImpoundName, Impound in pairs(Config.Impound) do
-            if #(data.coords - Impound.Coords) < 2.0 then
+          for impoundName, impound in pairs(Config.Impound) do
+            if #(data.coords - impound.Coords) < 2.0 then
               data.type = 'Impound'
-              data.vehType = Impound.Type
+              data.vehType = impound.Type
+              data.stored = 0
+              data.parkingLabel = impoundName
+              data.NotFree = impound.NotFree
+              data.spawnPoints = impound.SpawnPoint
+              if Config.UseAnim then
+                exports["rpemotes"]:EmoteCommandStart('tablet2')
+              end
               GetVehList(data)
             end
           end
         end,
         canInteract = function(entity, distance, coords, name, bone)
-          if distance < 2.0 then return true end
+          for garageName, impound in pairs(Config.Impound) do
+            if distance < 2.0 and #(coords - impound.Coords) < 2.0 then return true end
+          end
         end
       },
     })
@@ -162,82 +174,81 @@ CreateThread(function() -- Get and Save Vehicle
           SaveVeh(GetGarageName(target.coords, 'key', 'Garages'), target.entity)
         end,
         canInteract = function(entity, distance, coords, name, bone)
-          for garageName, Garage in pairs(Config.Garages) do
-            for i = 1, #Garage.DeletePoint do
-              if #(coords - Garage.DeletePoint[i].Pos) < 2.0 and HasPlayers(garageName) and HasGroups(garageName) then return true end
+          for garageName, garage in pairs(Config.Garages) do
+            for i = 1, #garage.DeletePoint do
+              if #(coords - garage.DeletePoint[i].Pos) < 2.0 and HasPlayers(garageName) and HasGroups(garageName) then return true end
             end
           end
         end
       }
     })
-  else
-    for garageName, Garage in pairs(Config.Garages) do
-      garages = lib.points.new(Garage.Coords, 3.0, {
-        type = 'Garages',
-        vehType = Garage.Type
-      })
-      function garages:nearby()
-        if HasPlayers(garageName) and HasGroups(garageName) then
-          lib.showTextUI(_K('press_get_veh'),{
-            position = "right-center",
-            icon = 'warehouse',
-              style = {
-              borderRadius = 5,
-              backgroundColor = '#4ba9ff',
-              color = 'white'
-            }
-          })
+  end
+end)
+
+CreateThread(function() -- not ox_target Get and Save Vehicle
+  while not Config.UseTarget do 
+    local Sleep = 1500
+    local playerCoords = GetEntityCoords(GetPlayerPed(-1))
+    local tempData = {}
+
+    for garageName, garage in pairs(Config.Garages) do
+      if #(playerCoords - garage.Coords) < 3.0 then
+        if HasPlayers(garageName) and HasGroups(garageName) and not IsPedInAnyVehicle(GetPlayerPed(-1), false) then
+          Sleep = 0
+          tempData.type = 'Garages'
+          tempData.vehType = garage.Type
+          tempData.stored = 1
+          tempData.parkingLabel = garageName
+          tempData.spawnPoints = garage.SpawnPoint
+          tempData.NotFree = garage.NotFree
+          ESX.Game.Utils.DrawText3D(vector3(garage.Coords.x, garage.Coords.y, garage.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
           if IsControlJustReleased(0, 38) then
-              GetVehList(self, self.coords)
+            if Config.UseAnim then
+              exports["rpemotes"]:EmoteCommandStart('tablet2')
+            end
+            GetVehList(tempData, playerCoords)
+            tempData = {}
           end
         end
       end
-      function garages:onExit()
-        lib.hideTextUI()
-      end
       
-      for i = 1, #Garage.DeletePoint, 1 do
-        invehGarages = lib.points.new(Garage.DeletePoint[i].Pos, 10)
-        function invehGarages:nearby()
+      for i = 1, #garage.DeletePoint, 1 do
+        if #(playerCoords - garage.DeletePoint[i].Pos) < 10 then
           if IsPedInAnyVehicle(GetPlayerPed(-1), false) and HasPlayers(garageName) and HasGroups(garageName) then
+            DrawMarker(36, garage.DeletePoint[i].Pos, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 255, 100, 100, 100, false, true, 2, true, false, false, false)   
+            Sleep = 0
             local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-            DrawMarker(36, self.coords, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 255, 100, 100, 100, false, true, 2, true, false, false, false)   
-            if self.currentDistance < 2.0 then
+            if #(playerCoords - garage.DeletePoint[i].Pos) < 2.0 then
               if IsControlJustReleased(0, 38) then
-                SaveVeh(GetGarageName(self.coords, 'key', 'Garages'), vehicle)
+                SaveVeh(GetGarageName(playerCoords, 'key', 'Garages'), vehicle)
               end
             end
           end
         end
       end
     end
-    function invehGarages:onExit()
-      lib.hideTextUI()
-    end
-    
-    for _, Impound in pairs(Config.Impound) do
-      impounds = lib.points.new(Impound.Coords, 3.0,{
-        type = 'Impound',
-        vehType = Impound.Type
-      })
-      function impounds:nearby()
-        lib.showTextUI(_K('press_get_veh'),{
-          position = "right-center",
-          icon = 'warehouse',
-          style = {
-            borderRadius = 5,
-            backgroundColor = '#4ba9ff',
-            color = 'white'
-          }
-        })
+
+    for impoundName, impound in pairs(Config.Impound) do
+      if #(playerCoords - impound.Coords) < 3.0 then
+        Sleep = 0
+        tempData.type = 'Impound'
+        tempData.vehType = impound.Type
+        tempData.stored = 0
+        tempData.parkingLabel = impoundName
+        tempData.spawnPoints = impound.SpawnPoint
+        tempData.notFree = impound.NotFree
+        ESX.Game.Utils.DrawText3D(vector3(impound.Coords.x, impound.Coords.y, impound.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
+        
         if IsControlJustReleased(0, 38) then
-          GetVehList(self, self.coords)
+          if Config.UseAnim then
+            exports["rpemotes"]:EmoteCommandStart('tablet2')
+          end
+          GetVehList(tempData, playerCoords)
+          tempData = {}
         end
       end
-      function impounds:onExit()
-        lib.hideTextUI()
-      end
     end
+    Wait(Sleep)
   end
 end)
 
@@ -278,52 +289,6 @@ AddEventHandler('kc_garage:notify', function(_type, args)
     })
   elseif Config.Notify == 'ESX' then
     ESX.ShowNotification(args)
-  end
-end)
-
-RegisterNetEvent('kc_garage:spawnVehicle')
-AddEventHandler('kc_garage:spawnVehicle', function(data)
-  local price = Config.VehicleFee[data.type][GetVehicleClassFromName(data.vehicle.model)]
-  local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(Config[data.type][data.parking].SpawnPoint)
-
-  if foundSpawn then
-    WaitForVehicleToLoad(data.vehicle.model)
-    ESX.TriggerServerCallback('kc_garage:checkMoney', function(playerMoney)
-      if playerMoney >= price then
-
-        if Config[data.type][data.parking].NotFree then
-          TriggerServerEvent('kc_garage:removeMoney', price)
-        end
-        
-        ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
-          ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
-          SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
-          SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
-          SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
-
-          if data.vehicle.deformation == nil or data.vehicle.deformation[1] == nil then
-            data.vehicle.deformation = GetVehicleDeformation(vehicle)
-          end
-          SetVehicleDeformation(vehicle, data.vehicle.deformation)
-          
-          if Config.AutoTeleportToVehicle or Config[data.type][data.parking].Type == 'boat' then
-            TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
-            SetVehicleEngineOn(vehicle, true, true)
-          end
-          
-          local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
-          vehicleProps.deformation = GetVehicleDeformation(vehicle)
-          TriggerServerEvent('kc_garage:updateOwnedVehicle', 0, nil, vehicleProps)
-          
-          if Config.AutoLockVeh then
-            SetVehicleDoorsLocked(vehicle, 2)
-          end
-          TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
-        end)
-      else
-        TriggerEvent('kc_garage:notify', 'error', _K('not_money'))
-      end
-    end, data.type)
   end
 end)
 
@@ -373,8 +338,8 @@ AddEventHandler('kc_garage:vehLockedEffect', function(netId, lockStatus)
   end
 end)
 
-RegisterNetEvent("kc_garage:deleteVehicle")
-AddEventHandler("kc_garage:deleteVehicle", function()
+RegisterNetEvent("kc_garage:deleteAllVehicles")
+AddEventHandler("kc_garage:deleteAllVehicles", function()
   local minuteCalculation = 6000
   local minutesPassed = 0
   local minutesLeft = Config.DeleteVehicleTimer
@@ -421,55 +386,84 @@ AddEventHandler("kc_garage:deleteVehicle", function()
 end)
 
 -- Function
-function GetVehList(data, playerCoords)
-  local stored = 1
-  local icons = 'car-side'
-  
-  if not playerCoords then
-    playerCoords = data.coords
-  end
-
-  if data.type == 'Impound' then
-    stored = 0
-  end
-
+function GetVehList(data)
   ESX.TriggerServerCallback('kc_garage:getVehiclesInParking', function(vehData)
-    local vehiclesTableList = {}
-    if vehData then
-      for i = 1, #vehData, 1 do
-        if vehData[i].vehType == Config[data.type][vehData[i].parking].Type and vehData[i].vehType == data.vehType then
-          local engineHealth = vehData[i].vehicle.engineHealth * 100 / 1000
-          local bodyHealth = vehData[i].vehicle.bodyHealth * 100 / 1000
-          local vehicleModel = GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))
-          if #(playerCoords - Config[data.type][vehData[i].parking].Coords) < 3.0 then
-            vehiclesTableList[vehicleModel] = {
-              description = _K('engine')..engineHealth..'% | '.._K('body')..bodyHealth..'% | '.._K('fuel')..vehData[i].vehicle.fuelLevel.. '%',
-              event = 'kc_garage:spawnVehicle',
-              icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]),
-              args = {
-                type = data.type,
-                parking = vehData[i].parking,
-                vehicle = vehData[i].vehicle,
-              },
-              metadata = {
-                [_K('parking')] = Config[data.type][vehData[i].parking].Label, 
-                [_K('plate')] = vehData[i].plate,
-                [_K('fee')] = Config.VehicleFee[data.type][GetVehicleClassFromName(vehData[i].vehicle.model)],
-                [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]
-              }
+    local vehicleList = {}
+    for i = 1, #vehData, 1 do
+      if vehData[i].vehType == data.vehType and vehData[i].parking == data.parkingLabel then
+        vehicleList[GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))] = {
+          description = _K('engine')..toPercent(vehData[i].vehicle.engineHealth)..'% | '.._K('body')..toPercent(vehData[i].vehicle.bodyHealth)..'% | '.._K('fuel')..vehData[i].vehicle.fuelLevel.. '%',
+          icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]),
+          metadata = {
+            [_K('parking')] = data.parkingLabel, 
+            [_K('plate')] = vehData[i].plate,
+            [_K('fee')] = Config.VehicleFee[data.type][GetVehicleClassFromName(vehData[i].vehicle.model)],
+            [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]
+          },
+          onSelect = function() 
+            args = {
+              type = data.type,
+              spawnPoints = data.spawnPoints,
+              parking = vehData[i].parking,
+              vehicle = vehData[i].vehicle,
+              price = Config.VehicleFee[data.type][GetVehicleClassFromName(vehData[i].vehicle.model)],
+              notFree = data.notFree
             }
-            ParkingName = Config[data.type][vehData[i].parking].Label
-          end
-        end
+            spawnVehicle(args) 
+          end,
+        }
       end
-      lib.registerContext({
-        id = 'garage_menu',
-        title = GetGarageName(playerCoords, 'label', data.type).. ' ' ..data.type,
-        options = vehiclesTableList
-      })
-      lib.showContext('garage_menu')
     end
-  end, stored)
+    lib.registerContext({
+      id = 'kc_garage:openVehicleListMenu',
+      title = GetGarageName(GetEntityCoords(GetPlayerPed(-1)), 'label', data.type).. ' ' ..data.type,
+      options = vehicleList,
+      onExit = function()
+        exports["rpemotes"]:EmoteCancel(true)
+      end
+    })
+    lib.showContext('kc_garage:openVehicleListMenu')
+  end, data.stored)
+end
+
+function spawnVehicle(data)
+  local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
+
+  if foundSpawn then
+    WaitForVehicleToLoad(data.vehicle.model)
+    exports["rpemotes"]:EmoteCancel(true)
+    ESX.TriggerServerCallback('kc_garage:checkMoney', function(playerMoney)
+      if playerMoney >= data.price then
+
+        if data.notFree then
+          TriggerServerEvent('kc_garage:removeMoney', data.price)
+        end
+        
+        ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
+          DoesEntityExist(vehicle)
+          SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
+          SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
+          SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
+          SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
+          ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
+          
+          if Config.AutoTeleportToVehicle then
+            TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
+            SetVehicleEngineOn(vehicle, true, true)
+          end
+
+          if Config.AutoLockVeh then
+            SetVehicleDoorsLocked(vehicle, 2)
+          end
+
+          TriggerServerEvent('kc_garage:updateStoredVehicle', 0, nil, data.vehicle.plate)
+          TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
+        end)
+      else
+        TriggerEvent('kc_garage:notify', 'error', _K('not_money'))
+      end
+    end, data.type)
+  end
 end
 
 function SaveVeh(garageName, vehicle)
@@ -481,7 +475,11 @@ function SaveVeh(garageName, vehicle)
         TaskLeaveVehicle(GetPlayerPed(-1), vehicle, 1)
         Wait(2000)
       end
-      DeleteVehicle(vehicle)
+
+      if DoesEntityExist(vehicle) then
+        DeleteVehicle(vehicle)
+      end
+      
       TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps)
     else
       TriggerEvent('kc_garage:notify', 'error', _K('not_yours_veh'))
@@ -529,16 +527,10 @@ function WaitForVehicleToLoad(modelHash)
 	if not HasModelLoaded(modelHash) then
 		RequestModel(modelHash)
 
-		BeginTextCommandBusyspinnerOn('STRING')
-		AddTextComponentSubstringPlayerName(_K('load_assets'))
-		EndTextCommandBusyspinnerOn(4)
-
 		while not HasModelLoaded(modelHash) do
 			Wait(0)
 			DisableAllControlActions(0)
 		end
-
-		BusyspinnerOff()
 	end
 end
 
@@ -783,9 +775,23 @@ function Round(value, numDecimals)
 	return math.floor(value * 10^numDecimals) / 10^numDecimals
 end
 
+function toPercent(v)
+  return math.floor(v * 100) / 1000
+end
+
 function JobsImpound(impoundLoc, plate, vehicleProps, identifier)
   TriggerServerEvent('kc_garage:jobsImpoundVehicle', impoundLoc, plate, vehicleProps, identifier)
   DeleteVehicle(vehicleProps.model)
+end
+
+function GetGarageLabel(key)
+  local label
+  for garageName, garage in pairs(Config.Garages) do
+    if key == garageName then
+      label = garage.Label
+      return label
+    end
+  end
 end
 
 -- Commands
@@ -815,7 +821,7 @@ end)
 RegisterCommand(Config.CmdVehDelete, function()
   ESX.TriggerServerCallback('kc_garage:getPlayersGroup', function(allowed)
     if allowed then
-      TriggerEvent('kc_garage:deleteVehicle')
+      TriggerEvent('kc_garage:deleteAllVehicles')
     else
       TriggerEvent('kc_garage:notify', 'error', _K('not_allowed'))
     end
@@ -824,3 +830,4 @@ end)
 
 -- Exports
 exports('JobsImpound', JobsImpound)
+exports('GetGarageLabel', GetGarageLabel)
