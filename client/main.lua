@@ -367,8 +367,10 @@ function GetVehList(data)
   ESX.TriggerServerCallback('kc_garage:getVehiclesInParking', function(vehData)
     local vehicleList = {}
     for i = 1, #vehData, 1 do
-      if vehData[i].vehType == data.vehType and vehData[i].parking == data.parkingKey then
-        vehicleList[GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))] = {
+      if vehData[i].parking == data.parkingKey then
+        local vehLabel = GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))
+        
+        vehicleList[vehLabel..' | '..vehData[i].plate] = {
           description = _K('engine')..toPercent(vehData[i].vehicle.engineHealth)..'% | '.._K('body')..toPercent(vehData[i].vehicle.bodyHealth)..'% | '.._K('fuel')..vehData[i].vehicle.fuelLevel.. '%',
           icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]),
           metadata = {
