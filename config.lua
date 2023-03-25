@@ -1,9 +1,10 @@
 Config = {}
 Config.CheckForUpdates = true  -- check for update available?
 Config.Locale = 'en'  -- 'en' or 'id'
-Config.UseTarget = true -- if you not use ox_target you can set false
+Config.UseTarget = false -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 Config.UseAnim = true -- play animation when requesting vehicle list?
+Config.ShowAllVehicleInList = true
 
 Config.AutoTeleportToVehicle = false -- auto teleport to vehicle if vehicle spawning
 Config.AutoLockVeh = true -- auto lock to vehicle if vehicle spawning
@@ -101,8 +102,8 @@ Config.Garages = { -- Garages Config
     Type = 'car', -- 'car', 'aircraft' and 'boat'
     Blip = true, -- if private garages you can set false
     NotFree = true, -- fee garages
-    Coords = vector3(215.4945, -808.5418, 30.7593), -- blips and ped coords
-    PedHeading = 249.1711, -- ped heading
+    Coords = vector3(214.7889, -806.4965, 30.8092), -- blips and ped coords
+    PedHeading = 341.4469, -- ped heading
     Players = { -- Players table allowed to access garages
       -- ex: {'steam:xxxxxxxxxxxx'}
     },
@@ -509,4 +510,47 @@ Config.Impound = { -- Impound Config
 			{ Pos = vector3(420.5472, -1641.9459, 29.0), Heading = 87.1742, },
 		},
 	},
+}
+
+Config.Blips = {
+  Garages = {
+    aircraft = {
+      Sprite = 359,
+      Colour = 3,
+      Display = 2,
+      Scale = 0.8
+    },
+    car = {
+      Sprite = 357,
+      Colour = 3,
+      Display = 2,
+      Scale = 0.8
+    },
+    boat = {
+      Sprite = 356,
+      Colour = 3,
+      Display = 2,
+      Scale =  0.8
+    }
+  },
+  Impounds = {
+    aircraft = {
+      Sprite = 359,
+      Colour = 51,
+      Display = 2,
+      Scale = 0.8
+    },
+    car = {
+      Sprite = 477,
+      Colour = 51,
+      Display = 2,
+      Scale = 0.7
+    },
+    boat = {
+      Sprite = 356,
+      Colour = 51,
+      Display = 2,
+      Scale =  0.8
+    }
+  }
 }

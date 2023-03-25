@@ -55,21 +55,13 @@ CreateThread(function() -- Create Blips And Spawn Peds
   for _, v in pairs(Config.Garages) do
     if v.Blip then
       local blip = AddBlipForCoord(v.Coords)
-      if v.Type == 'aircraft' then
-        SetBlipSprite(blip, 359)
-        SetBlipColour(blip, 3)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.8)
-      elseif v.Type == 'car' then
-        SetBlipSprite(blip, 357)
-        SetBlipColour(blip, 3)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.8)
-      elseif v.Type == 'boat' then
-        SetBlipSprite(blip, 356)
-        SetBlipColour(blip, 3)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.8)
+      for blipsType, blips in pairs(Config.Blips.Garages) do
+        if blipsType == v.Type then
+          SetBlipSprite(blip, blips.Sprite)
+          SetBlipColour(blip, blips.Colour)
+          SetBlipDisplay(blip, blips.Display)
+          SetBlipScale(blip, blips.Scale)
+        end
       end
       SetBlipAsShortRange(blip, true)
       BeginTextCommandSetBlipName('STRING')
@@ -82,21 +74,13 @@ CreateThread(function() -- Create Blips And Spawn Peds
   for _, v in pairs(Config.Impound) do
     if v.Blip then
       local blip = AddBlipForCoord(v.Coords)
-      if v.Type == 'aircraft' then
-        SetBlipSprite(blip, 359)
-        SetBlipColour(blip, 51)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.8)
-      elseif v.Type == 'car' then
-        SetBlipSprite(blip, 477)
-        SetBlipColour(blip, 51)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.7)
-      elseif v.Type == 'boat' then
-        SetBlipSprite(blip, 356)
-        SetBlipColour(blip, 51)
-        SetBlipDisplay(blip, 2)
-        SetBlipScale(blip, 0.8)
+      for blipsType, blips in pairs(Config.Blips.Impounds) do
+        if blipsType == v.Type then
+          SetBlipSprite(blip, blips.Sprite)
+          SetBlipColour(blip, blips.Colour)
+          SetBlipDisplay(blip, blips.Display)
+          SetBlipScale(blip, blips.Scale)
+        end
       end
       SetBlipAsShortRange(blip, true)
       BeginTextCommandSetBlipName('STRING')
@@ -120,7 +104,7 @@ CreateThread(function() -- ox_target Get and Save Vehicle
               data.type = 'Garages'
               data.vehType = garage.Type
               data.stored = 1
-              data.parkingLabel = garageName
+              data.parkingKey = garageName
               data.NotFree = garage.NotFree
               data.spawnPoints = garage.SpawnPoint
               PlayAnim(Config.UseAnim)
@@ -146,7 +130,7 @@ CreateThread(function() -- ox_target Get and Save Vehicle
               data.type = 'Impound'
               data.vehType = impound.Type
               data.stored = 0
-              data.parkingLabel = impoundName
+              data.parkingKey = impoundName
               data.NotFree = impound.NotFree
               data.spawnPoints = impound.SpawnPoint
               PlayAnim(Config.UseAnim)
@@ -195,7 +179,7 @@ CreateThread(function() -- not ox_target Get and Save Vehicle
           tempData.type = 'Garages'
           tempData.vehType = garage.Type
           tempData.stored = 1
-          tempData.parkingLabel = garageName
+          tempData.parkingKey = garageName
           tempData.spawnPoints = garage.SpawnPoint
           tempData.NotFree = garage.NotFree
           ESX.Game.Utils.DrawText3D(vector3(garage.Coords.x, garage.Coords.y, garage.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
@@ -229,7 +213,7 @@ CreateThread(function() -- not ox_target Get and Save Vehicle
         tempData.type = 'Impound'
         tempData.vehType = impound.Type
         tempData.stored = 0
-        tempData.parkingLabel = impoundName
+        tempData.parkingKey = impoundName
         tempData.spawnPoints = impound.SpawnPoint
         tempData.notFree = impound.NotFree
         ESX.Game.Utils.DrawText3D(vector3(impound.Coords.x, impound.Coords.y, impound.Coords.z + 1.0), _K('press_get_veh'), 1.0, 4)
@@ -383,12 +367,12 @@ function GetVehList(data)
   ESX.TriggerServerCallback('kc_garage:getVehiclesInParking', function(vehData)
     local vehicleList = {}
     for i = 1, #vehData, 1 do
-      if vehData[i].vehType == data.vehType and vehData[i].parking == data.parkingLabel then
+      if vehData[i].vehType == data.vehType and vehData[i].parking == data.parkingKey then
         vehicleList[GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))] = {
           description = _K('engine')..toPercent(vehData[i].vehicle.engineHealth)..'% | '.._K('body')..toPercent(vehData[i].vehicle.bodyHealth)..'% | '.._K('fuel')..vehData[i].vehicle.fuelLevel.. '%',
           icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]),
           metadata = {
-            [_K('parking')] = data.parkingLabel, 
+            [_K('parking')] = GetGarageLabel(vehData[i].parking), 
             [_K('plate')] = vehData[i].plate,
             [_K('fee')] = Config.VehicleFee[data.type][GetVehicleClassFromName(vehData[i].vehicle.model)],
             [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]
@@ -840,7 +824,7 @@ RegisterCommand('givekeys', function()
   local vehicle, dist = ESX.Game.GetClosestVehicle()
   if DoesEntityExist(vehicle) and closestP ~= -1 and closestD < 4 and dist < 10 then
     local plate = ESX.Game.GetVehicleProperties(vehicle).plate
-    TriggerServerEvent('kc_garage:GiveKeyToPerson', plate, GetPlayerServerId(closestP))
+    TriggerServerEvent('kc_garage:giveKeyToPerson', plate, GetPlayerServerId(closestP))
   else
     TriggerEvent('kc_garage:notify', 'error', _K('not_found'))
   end
