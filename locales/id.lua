@@ -25,5 +25,10 @@ Locales['id'] = {
   ['target_impounded'] = 'Kendaraan Anda dengan nomor plat: %s telah disita oleh %s',
   ['player_impounded'] = 'Penyitaan kendaraan selesai',
   ['received_keys'] = 'Kunci kendaraan dengan plat nomor: %s telah diterima',
-  ['given_keys'] = 'Berhasil memberikan kunci kendaraan dengan plat nomor: %s'
+  ['given_keys'] = 'Berhasil memberikan kunci kendaraan dengan plat nomor: %s',
+  ['canot_spawn_here'] = 'Tidak bisa mengeluarkan kendaraan disini!',
+  ['canot_store'] = 'Tidak bisa menyimpan kendaraan disini',
+  ['veh_already'] = 'Kendaraan sudah ada',
+  ['bank_used'] = 'Saldo Bank terpakai %s',
+  ['gps_set'] = 'GPS sudah di setting ke kendaraan anda'
 }

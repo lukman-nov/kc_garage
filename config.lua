@@ -1,10 +1,12 @@
 Config = {}
 Config.CheckForUpdates = true  -- check for update available?
 Config.Locale = 'en'  -- 'en' or 'id'
-Config.UseTarget = false -- if you not use ox_target you can set false
+Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 Config.UseAnim = true -- play animation when requesting vehicle list?
-Config.ShowAllVehicleInList = true
+Config.ShowVehImpoundInGarage = true
+Config.SpawnVehicleInAnyGarage = false -- if true, the fee will be multiplied.
+Config.FeeSpawnVehicleInAnyGarage = {[1] = 2, [2] = 3} -- [1] = garages fee * 2, [2] = impound fee * 3 and if you set 0 it's the same as free
 
 Config.AutoTeleportToVehicle = false -- auto teleport to vehicle if vehicle spawning
 Config.AutoLockVeh = true -- auto lock to vehicle if vehicle spawning
@@ -12,9 +14,9 @@ Config.PayIn = 'money' -- Player can pay vehicle fee with 'money' or 'bank'
 Config.LockKeyVehicle = 'U' -- https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
 
 Config.CmdVehDelete = 'asuransi' -- Admin command for delete vehicle in the words
-Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 81 config.lua
+Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 84 config.lua
 Config.DeleteVehicleTimer = 180 -- in second
-Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 92 config.lua
+Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 95 config.lua
 
 Config.VehicleFee = { -- if set to 0 the player does not pay
   Garages = { -- Garage Fee
@@ -205,8 +207,8 @@ Config.Garages = { -- Garages Config
     }
   },
 
-  SandyShores = {
-    Label = 'Sandy Shores',
+  SandyShoresG = {
+    Label = 'Sandy Shores Garage',
     Type = 'car',
     Blip = true,
     NotFree = true,
@@ -456,7 +458,7 @@ Config.Garages = { -- Garages Config
 
 Config.Impound = { -- Impound Config
 	SandyShores = {
-		Label = 'Sandy Shores',
+		Label = 'Sandy Shores Impound',
     Type = 'car',
     IsDefaultImpound = true,
 		Blip = true,
@@ -495,7 +497,7 @@ Config.Impound = { -- Impound Config
 	},
 
 	JobsImpound = { -- if for jobs keywords should start with the word Jobs
-		Label = 'Jobs',
+		Label = 'Police Impound',
     Type = 'car',
     IsDefaultImpound = false,
 		Blip = true,

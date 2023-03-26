@@ -1,14 +1,13 @@
 ESX = exports["es_extended"]:getSharedObject()
 local vehiclesCache = {}
 
-ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb, stored)
+ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb)
   local src = source
 	local xPlayer  = ESX.GetPlayerFromId(src)
 
-	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `owner` = @identifier AND `stored` = @stored',
+	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `owner` = @identifier',
 	{
 		['@identifier'] = xPlayer.identifier,
-		['@stored'] = stored
 	}, function(result)
 
 		local vehicles = {}
@@ -24,7 +23,8 @@ ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb
 					vehicle 	= json.decode(result[i].vehicle),
 					plate 		= result[i].plate,
 					parking   = result[i].parking,
-					vehType 	= currenType
+					vehType 	= currenType,
+					stored 		= result[i].stored
 				})
 			end
 		end
@@ -36,16 +36,20 @@ end)
 ESX.RegisterServerCallback('kc_garage:checkVehicleOwner', function(source, cb, plate)
     local xPlayer = ESX.GetPlayerFromId(source)
 
-	MySQL.query('SELECT COUNT(*) as count FROM `owned_vehicles` WHERE `owner` = @identifier AND `plate` = @plate',
+	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `owner` = @identifier AND `plate` = @plate',
 	{
 		['@identifier'] 	= xPlayer.identifier,
 		['@plate']     		= plate
 	}, function(result)
 
-		if tonumber(result[1].count) > 0 then
-			return cb(true)
+		if result[1].owner == xPlayer.identifier then
+			if result[1].type and not result[1].stored then
+				cb(result[1].type)
+			else
+				print('Unable to find the vehicle type, please report to admin!')
+			end
 		else
-			return cb(false)
+			TriggerClientEvent('kc_garage:notify', source, 'error', _K('not_yours_veh'))
 		end
 	end)
 end)
@@ -64,11 +68,39 @@ ESX.RegisterServerCallback('kc_garage:checkMoney', function(source, cb, type)
 	cb(xPlayer.getMoney())
 end)
 
-RegisterNetEvent('kc_garage:removeMoney')
-AddEventHandler('kc_garage:removeMoney', function(amount)
-	local src = source
-	local xPlayer = ESX.GetPlayerFromId(src)
-	xPlayer.removeAccountMoney(Config.PayIn, amount)
+RegisterNetEvent('kc_garage:vehicleChecking')
+AddEventHandler('kc_garage:vehicleChecking', function(data)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local vehicles = GetAllVehicles()
+	local canSpawn = false
+	if vehicles[1] == nil then canSpawn = true end
+
+  for i = 1, #vehicles, 1 do 
+    if ESX.Math.Trim(GetVehicleNumberPlateText(vehicles[i])) == data.vehicle.plate then
+			TriggerClientEvent('kc_garage:notify', source, 'error', _K('veh_already'))
+			
+			return TriggerClientEvent('kc_garage:setCoords', source, GetEntityCoords(vehicles[i]))
+    end
+  end
+
+	if xPlayer.getMoney() >= data.price then
+		if data.notFree then
+			xPlayer.removeAccountMoney(Config.PayIn, data.price)
+
+			if Config.PayIn == 'bank' then
+				TriggerClientEvent('kc_garage:notify', src, 'inform', _K('bank_used', ESX.Math.GroupDigits(data.price)))
+				-- Trigger your bank resouces
+				-- TriggerEvent('kc_banking:AddTransactionHistory', xPlayer.source, "personal", -data.price, "withdraw", 'N/A', "Pay "..data.type) -- DELETE THIS
+			end
+		end
+		canSpawn = true
+	else
+		TriggerClientEvent('kc_garage:notify', xPlayer.source, 'error', _K('not_money'))
+	end
+
+	if canSpawn then
+		TriggerClientEvent('kc_garage:spawnVehicle', xPlayer.source, data)
+	end
 end)
 
 RegisterServerEvent('kc_garage:updateOwnedVehicle')

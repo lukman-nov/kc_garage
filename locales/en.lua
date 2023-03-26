@@ -25,5 +25,10 @@ Locales['en'] = {
   ['target_impounded'] = 'Your vehicle with license plate number: %s has been impounded by the %s',
   ['player_impounded'] = 'you have impounded the vehicle',
   ['received_keys'] = 'You have received keys of a vehicle with a license plate: %s',
-  ['given_keys'] = 'You have given keys of a vehicle with a license plate: %s'
+  ['given_keys'] = 'You have given keys of a vehicle with a license plate: %s',
+  ['canot_spawn_here'] = 'You canot spawn this vehicle here!',
+  ['canot_store'] = 'You can\'t store this vehicle here',
+  ['veh_already'] = 'Vehicle already exists',
+  ['bank_used'] = 'Your bank balance is used $ %s',
+  ['gps_set'] = 'GPS is already set to your vehicle'
 }
