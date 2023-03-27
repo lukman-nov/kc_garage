@@ -2,7 +2,6 @@ local ESX = nil
 local MDI = 50
 local DDT = 0.05
 local inAnim = false
-local vehId = {}
 
 local vehicleClassName = {
   [0] = 'Compacts',
@@ -556,7 +555,7 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
       SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
       SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
       SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
-      SetVehicleDeformation(vehicle, data.vehicle.deformation)
+      SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
       ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
       
       if Config.AutoTeleportToVehicle then
@@ -806,7 +805,7 @@ function SetVehicleDeformation(vehicle, deformationPoints, callback)
 end
 
 function IsDeformationWorse(newDef, oldDef)
-  if newDef == nil and oldDef == nil then return false end
+  if newDef[1] == nil and oldDef[1] == nil then return false end
 	if (oldDef == nil or #newDef > #oldDef) then
 		return true
 	elseif (#newDef < #oldDef) then
@@ -909,8 +908,7 @@ function GetGarageLabel(key, _type)
   local label
   for garageName, garage in pairs(Config[_type]) do
     if key == garageName then
-      label = garage.Label
-      return label
+      return garage.Label
     end
   end
 end
