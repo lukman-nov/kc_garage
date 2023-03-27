@@ -55,7 +55,7 @@ exports['kc_garage']:JobsImpound('ImpoundName', vehicle, ESX.PlayerData.identifi
 -- [[ EXAMPLE ]] --
 RegisterCommand('JobsImpound', function()
   local vehicle = ESX.Game.GetClosestVehicle()
-  JobsImpound('JobsImpound', vehicle, ESX.GetPlayerData().identifier)
+  exports['kc_garage']:JobsImpound('JobsImpound', vehicle, ESX.GetPlayerData().identifier)
 end)
 ```
 
