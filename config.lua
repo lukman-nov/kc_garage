@@ -343,7 +343,7 @@ Config.Garages = { -- Garages Config
     Coords = vector3(-548.7320, 5004.7842, 153.5449), 
     PedHeading = 235.7023,
     Players = {
-      {'steam:11000010836eaab'}
+      
     },
     Groups = {
       

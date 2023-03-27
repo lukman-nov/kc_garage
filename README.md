@@ -19,7 +19,6 @@ I share this script with you for free.
 <a href="https://youtu.be/sb_Y4lud-IM"><img src="https://media.discordapp.net/attachments/1060165701136044052/1088129652104634388/kc_garage.png"></a>
 </div>
 
-
 ### 📺 [Preview](https://youtu.be/sb_Y4lud-IM)
 
 ### ✅ Main Features
@@ -51,11 +50,14 @@ I share this script with you for free.
 ### 🧰 Usage
 
 ```lua
-exports['kc_garage']:JobsImpound('ImpoundName', VehiclePlate, VehiclePropertis, ESX.PlayerData.identifier)
-exports['kc_garage']:GetGarageLabel(db.parking) -- maybe you need xD
-```
+exports['kc_garage']:JobsImpound('ImpoundName', vehicle, ESX.PlayerData.identifier)
 
-`ImpoundName` must be the same as the one in `Config.Impound[ImpoundName]`
+-- [[ EXAMPLE ]] --
+RegisterCommand('JobsImpound', function()
+  local vehicle = ESX.Game.GetClosestVehicle()
+  JobsImpound('JobsImpound', vehicle, ESX.GetPlayerData().identifier)
+end)
+```
 
 ```lua
 Config.Garages = {
