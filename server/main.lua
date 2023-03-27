@@ -41,12 +41,13 @@ ESX.RegisterServerCallback('kc_garage:checkVehicleOwner', function(source, cb, p
 		['@identifier'] 	= xPlayer.identifier,
 		['@plate']     		= plate
 	}, function(result)
-
-		if result[1].owner == xPlayer.identifier then
-			if result[1].type and not result[1].stored then
-				cb(result[1].type)
+		if result[1] then
+			if result[1].owner == xPlayer.identifier then
+				if result[1].type and not result[1].stored then
+					cb(result[1].type)
+				end
 			else
-				print('Unable to find the vehicle type, please report to admin!')
+				TriggerClientEvent('kc_garage:notify', source, 'error', _K('not_yours_veh'))
 			end
 		else
 			TriggerClientEvent('kc_garage:notify', source, 'error', _K('not_yours_veh'))
