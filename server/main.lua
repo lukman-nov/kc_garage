@@ -10,47 +10,59 @@ ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb
 		['@identifier'] = xPlayer.identifier,
 	}, function(result)
 
-		local vehicles = {}
-		for i = 1, #result, 1 do
-			local currenType = result[i].type
+		if result[1] then
+			local vehicles = {}
+			for i = 1, #result, 1 do
+				local currenType = result[i].type
 
-			if currenType == 'helicopter' or currenType == 'airplane' then
-				currenType = 'aircraft'
+				if currenType == 'helicopter' or currenType == 'airplane' then
+					currenType = 'aircraft'
+				end
+				
+				if result[i].parking then
+					table.insert(vehicles, {
+						vehicle 	= json.decode(result[i].vehicle),
+						plate 		= result[i].plate,
+						parking   = result[i].parking,
+						vehType 	= currenType,
+						stored 		= result[i].stored
+					})
+				end
 			end
-			
-			if result[i].parking then
-				table.insert(vehicles, {
-					vehicle 	= json.decode(result[i].vehicle),
-					plate 		= result[i].plate,
-					parking   = result[i].parking,
-					vehType 	= currenType,
-					stored 		= result[i].stored
-				})
-			end
+
+			cb(vehicles)
 		end
-
-		cb(vehicles)
 	end)
 end)
 
-ESX.RegisterServerCallback('kc_garage:checkVehicleOwner', function(source, cb, plate)
-    local xPlayer = ESX.GetPlayerFromId(source)
+ESX.RegisterServerCallback('kc_garage:checkVehicle', function(source, cb, plate)
+  local xPlayer = ESX.GetPlayerFromId(source)
 
 	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `owner` = @identifier AND `plate` = @plate',
 	{
 		['@identifier'] 	= xPlayer.identifier,
 		['@plate']     		= plate
 	}, function(result)
+		local data = {}
 		if result[1] then
 			if result[1].owner == xPlayer.identifier then
-				if result[1].type and not result[1].stored then
-					cb(result[1].type)
+				
+				local currenType = result[1].type
+
+				if currenType == 'helicopter' or currenType == 'airplane' then
+					currenType = 'aircraft'
 				end
-			else
-				TriggerClientEvent('kc_garage:notify', source, 'error', _K('not_yours_veh'))
+
+				if result[1].type and not result[1].stored then
+					table.insert(data, {
+						owner = true,
+						vehType = currenType
+					})
+					cb(data)
+				end
 			end
 		else
-			TriggerClientEvent('kc_garage:notify', source, 'error', _K('not_yours_veh'))
+			cb(false)
 		end
 	end)
 end)
@@ -215,30 +227,38 @@ end)
 RegisterNetEvent('kc_garage:giveKeyToPerson')
 AddEventHandler('kc_garage:giveKeyToPerson', function(target, plate)
 	local xPlayer = ESX.GetPlayerFromId(source)
-	local owner = MySQL.Sync.fetchScalar('SELECT owner FROM owned_vehicles WHERE plate = "'..plate..'"')
-	if owner == xPlayer.identifier then
-    local xTarget = ESX.GetPlayerFromId(target)
-    local peopleWithKeys = MySQL.Sync.fetchScalar('SELECT peopleWithKeys FROM owned_vehicles WHERE plate = "'..plate..'"')
-    local keysTable = json.decode(peopleWithKeys)
-    keysTable[xTarget.identifier] = true
-		
-		MySQL.Async.execute('UPDATE owned_vehicles SET peopleWithKeys = @peopleWithKeys WHERE plate = @plate', {
-			['@peopleWithKeys'] = json.encode(keysTable),
-			['@plate'] = plate
-		}, function(rowsUpdated)
-			if rowsUpdated > 0 then
-				TriggerClientEvent('kc_garage:notify', xTarget.source, 'inform', _K('received_keys', plate))
-				TriggerClientEvent('kc_garage:notify', xPlayer.source, 'inform', _K('given_keys', plate))
+	local xTarget = ESX.GetPlayerFromId(target)
+	if not xTarget and not xPlayer then return end
+
+	MySQL.query('SELECT * FROM owner_vehicles WHERE `plate` = @plate AND `owner` = @identifier ', {
+		['@plate'] = plate,
+		['@identifier'] = xPlayer.identifier
+	}, function(result)
+		if result[1] then
+			for i = 1,#result, 1 do 
+				if result[i].owner == xPlayer.identifier then
+					
+					MySQL.update('UPDATE owned_vehicles SET `peopleWithKeys` = @peopleWithKeys WHERE `plate` = @plate AND `owner` = @identifier', {
+						['@plate'] = plate,
+						['@identifier'] = xPlayer.identifier,
+						['@peopleWithKeys'] = xTarget.identifier
+					}, function(rowsUpdated)
+						if rowsUpdated > 0 then
+							TriggerClientEvent('kc_garage:notify', xTarget.source, 'inform', _K('received_keys', plate))
+							TriggerClientEvent('kc_garage:notify', xPlayer.source, 'inform', _K('given_keys', plate))
+						end
+					end)
+					
+					if vehiclesCache[plate] then
+						vehiclesCache[plate][xTarget.identifier] = true
+					end
+
+				else
+					TriggerClientEvent('kc_garage:notify', xPlayer.source, 'error', _K('not_yours_veh'))
+				end
 			end
-		end)
-		
-		if vehiclesCache[plate] then
-			vehiclesCache[plate][xTarget.identifier] = true
 		end
-	
-	else
-		TriggerClientEvent('kc_garage:notify', xPlayer.source, 'error', _K('not_yours_veh'))
-	end
+	end)
 end)
 
 RegisterNetEvent('kc_garage:filterVehiclesType')

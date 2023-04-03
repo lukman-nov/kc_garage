@@ -6,7 +6,7 @@ name 				'kc_garage'
 description 'Garages for ESX Legacy'
 author 			'Lukman_Nov#5797'
 repository 	'https://github.com/lukman-nov/kc_garage'
-version 		'2.3.1'
+version 		'2.3.2'
 license    	'GNU General Public License v3.0'
 
 shared_scripts {

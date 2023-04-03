@@ -30,5 +30,6 @@ Locales['id'] = {
   ['canot_store'] = 'Tidak bisa menyimpan kendaraan disini',
   ['veh_already'] = 'Kendaraan sudah ada',
   ['bank_used'] = 'Saldo Bank terpakai %s',
-  ['gps_set'] = 'GPS sudah di setting ke kendaraan anda'
+  ['gps_set'] = 'GPS sudah di setting ke kendaraan anda',
+  ['veh_not_exist'] = 'Kendaraan tidak ada'
 }

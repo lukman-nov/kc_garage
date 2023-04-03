@@ -1,8 +1,7 @@
 local ESX = nil
-local MDI = 50
-local DDT = 0.05
 local inAnim = false
 local isDead = false
+local garages = {}
 
 local vehicleClassName = {
   [0] = 'Compacts',
@@ -27,16 +26,6 @@ local vehicleClassName = {
   [19] = 'Military',
   [20] = 'Commercial',
   [21] = 'Train'
-}
-
-local entityEnumerator = {
-	__gc = function(enum)
-    if enum.destructor and enum.handle then
-		  enum.destructor(enum.handle)
-	  end
-    enum.destructor = nil
-    enum.handle = nil
-  end
 }
 
 -- Thread
@@ -382,35 +371,32 @@ end)
 
 RegisterNetEvent('kc_garage:spawnVehicle')
 AddEventHandler('kc_garage:spawnVehicle', function(data)
-  local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
-  if foundSpawn then
-    WaitForVehicleToLoad(data.vehicle.model)
-    ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
-      SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
-      SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
-      SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
-      SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
-      ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
-      
-      if Config.AutoTeleportToVehicle then
-        TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
-        SetVehicleEngineOn(vehicle, true, true)
-      end
-  
-      if Config.AutoLockVeh then
-        SetVehicleDoorsLocked(vehicle, 2)
-      end
-  
-      for impoundName, impound in pairs(Config.Impound) do
-        if data.vehType == impound.Type then
-          if impound.IsDefaultImpound then
-            TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate)
-          end
+  WaitForVehicleToLoad(data.vehicle.model)
+  ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
+    SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
+    SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
+    SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
+    SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
+    ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
+    
+    if Config.AutoTeleportToVehicle then
+      TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
+      SetVehicleEngineOn(vehicle, true, true)
+    end
+
+    if Config.AutoLockVeh then
+      SetVehicleDoorsLocked(vehicle, 2)
+    end
+    TriggerServerEvent('kc_garage:payFee', data)
+    for impoundName, impound in pairs(Config.Impound) do
+      if data.vehType == impound.Type then
+        if impound.IsDefaultImpound then
+          TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate)
         end
       end
-      TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
-    end)
-  end
+    end
+    TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
+  end)
 end)
 
 -- Function
@@ -456,13 +442,16 @@ function GetVehInGarage(data)
               notFree = data.NotFree
             }
             PlayAnim(Config.UseAnim)
-            if Config.SpawnVehicleInAnyGarage then
-              TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
-            else
-              if vehData[i].parking == data.parkingKey then
+            local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
+            if foundSpawn then
+              if Config.SpawnVehicleInAnyGarage then
                 TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
               else
-                TriggerEvent('kc_garage:notify', 'error', _K('canot_spawn_here'))
+                if vehData[i].parking == data.parkingKey then
+                  TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
+                else
+                  TriggerEvent('kc_garage:notify', 'error', _K('canot_spawn_here'))
+                end
               end
             end
           end,
@@ -516,13 +505,16 @@ function GetVehInImpound(data, key)
               notFree = data.NotFree
             }
             PlayAnim(Config.UseAnim)
-            if Config.SpawnVehicleInAnyGarage and not string.match(vehData[i].parking, 'Jobs') then
-              TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
-            else
-              if vehData[i].parking == data.parkingKey then
+            local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
+            if foundSpawn then
+              if Config.SpawnVehicleInAnyGarage and not string.match(vehData[i].parking, 'Jobs') then
                 TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
               else
-                TriggerEvent('kc_garage:notify', 'error', _K('canot_spawn_here'))
+                if vehData[i].parking == data.parkingKey then
+                  TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
+                else
+                  TriggerEvent('kc_garage:notify', 'error', _K('canot_spawn_here'))
+                end
               end
             end
           end,
@@ -553,19 +545,26 @@ end
 function SaveVeh(garageName, vehicle)
   local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
   vehicleProps.deformation = GetVehicleDeformation(vehicle)
-  ESX.TriggerServerCallback('kc_garage:checkVehicleOwner', function(vehType)
-    if Config.Garages[garageName].Type == vehType then
-      if not Config.UseTarget then
-        TaskLeaveVehicle(GetPlayerPed(-1), vehicle, 1)
-        Wait(2000)
-      end
-      
-      if DoesEntityExist(vehicle) then
-        DeleteVehicle(vehicle)
-        TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps)
+  ESX.TriggerServerCallback('kc_garage:checkVehicle', function(data)
+    if data and data[1].owner then
+      if Config.Garages[garageName].Type == data[1].vehType then
+        if not Config.UseTarget then
+          exports.ox_target:removeGlobalVehicle('storedVeh')
+          TaskLeaveVehicle(GetPlayerPed(-1), vehicle, 1)
+          Wait(2000)
+        end
+        if DoesEntityExist(vehicle) then
+          DeleteVehicle(vehicle)
+          TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps)
+          -- TriggerServerEvent('kc_fuel:UpdateVehicleDateTimeIn', plate) -- REMOVE THIS
+        else
+          TriggerEvent('kc_garage:notify', 'error', _K('veh_not_exist'))
+        end
+      else
+        TriggerEvent('kc_garage:notify', 'error', _K('canot_store'))
       end
     else
-      TriggerEvent('kc_garage:notify', 'error', _K('canot_store'))
+      TriggerEvent('kc_garage:notify', 'error', _K('not_yours_veh'))
     end
   end, vehicleProps.plate)
 end
@@ -664,186 +663,6 @@ function SpawnNpc(coords, heading, model)
   FreezeEntityPosition(ped, true)
   SetEntityInvincible(ped, true)
   SetBlockingOfNonTemporaryEvents(ped, true)
-end
-
-function EnumerateEntities(initFunc, moveFunc, disposeFunc)
-	return coroutine.wrap(function()
-		local iter, id = initFunc()
-		if not id or id == 0 then
-			disposeFunc(iter)
-			return
-		end
-
-		local enum = {handle = iter, destructor = disposeFunc}
-		setmetatable(enum, entityEnumerator)
-
-		local next = true
-		repeat
-			coroutine.yield(id)
-			next, id = moveFunc(iter)
-		until not next
-
-		enum.destructor, enum.handle = nil, nil
-		disposeFunc(iter)
-	end)
-end
-
-function EnumerateVehicles()
-	return EnumerateEntities(FindFirstVehicle, FindNextVehicle, EndFindVehicle)
-end
-
-function GetVehicleDeformation(vehicle)
-	local offsets = GetVehicleOffsetsForDeformation(vehicle)
-	local deformationPoints = {}
-	for i, offset in ipairs(offsets) do
-		local dmg = math.floor(#(GetVehicleDeformationAtPos(vehicle, offset)) * 1000.0) / 1000.0
-		if (dmg > DDT) then
-			table.insert(deformationPoints, { offset, dmg })
-		end
-	end
-	return deformationPoints
-end
-
-function SetVehicleDeformation(vehicle, deformationPoints, callback)
-	if (not IsDeformationWorse(deformationPoints, GetVehicleDeformation(vehicle))) then return end
-
-	Citizen.CreateThread(function()
-		local fDeformationDamageMult = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDeformationDamageMult")
-		local damageMult = 20.0
-		if (fDeformationDamageMult <= 0.55) then
-			damageMult = 1000.0
-		elseif (fDeformationDamageMult <= 0.65) then
-			damageMult = 400.0
-		elseif (fDeformationDamageMult <= 0.75) then
-			damageMult = 200.0
-		end
-
-		local printMsg = false
-
-		for i, def in ipairs(deformationPoints) do
-			def[1] = vector3(def[1].x, def[1].y, def[1].z)
-		end
-
-		local deform = true
-		local iteration = 0
-		while (deform and iteration < MDI) do
-			if (not DoesEntityExist(vehicle)) then return end
-
-			deform = false
-
-			for i, def in ipairs(deformationPoints) do
-				if (#(GetVehicleDeformationAtPos(vehicle, def[1])) < def[2]) then
-					SetVehicleDamage(
-						vehicle, 
-						def[1] * 2.0, 
-						def[2] * damageMult, 
-						1000.0, 
-						true
-					)
-
-					deform = true
-				end
-			end
-
-			iteration = iteration + 1
-
-			Citizen.Wait(100)
-		end
-		if (callback) then
-			callback()
-		end
-	end)
-end
-
-function IsDeformationWorse(newDef, oldDef)
-  if newDef[1] == nil and oldDef[1] == nil then return false end
-	if (oldDef == nil or #newDef > #oldDef) then
-		return true
-	elseif (#newDef < #oldDef) then
-		return false
-	end
-
-	for i, new in ipairs(newDef) do
-		local found = false
-		for j, old in ipairs(oldDef) do
-			if (new[1] == old[1]) then
-				found = true
-
-				if (new[2] > old[2]) then
-					return true
-				end
-			end
-		end
-
-		if (not found) then
-			return true
-		end
-	end
-
-	return false
-end
-
-function GetVehicleOffsetsForDeformation(vehicle)
-	local min, max = GetModelDimensions(GetEntityModel(vehicle))
-	local X = Round((max.x - min.x) * 0.5, 2)
-	local Y = Round((max.y - min.y) * 0.5, 2)
-	local Z = Round((max.z - min.z) * 0.5, 2)
-	local halfY = Round(Y * 0.5, 2)
-
-	return {
-		vector3(-X, Y,  0.0),
-		vector3(-X, Y,  Z),
-
-		vector3(0.0, Y,  0.0),
-		vector3(0.0, Y,  Z),
-
-		vector3(X, Y,  0.0),
-		vector3(X, Y,  Z),
-
-
-		vector3(-X, halfY,  0.0),
-		vector3(-X, halfY,  Z),
-
-		vector3(0.0, halfY,  0.0),
-		vector3(0.0, halfY,  Z),
-
-		vector3(X, halfY,  0.0),
-		vector3(X, halfY,  Z),
-
-
-		vector3(-X, 0.0,  0.0),
-		vector3(-X, 0.0,  Z),
-
-		vector3(0.0, 0.0,  0.0),
-		vector3(0.0, 0.0,  Z),
-
-		vector3(X, 0.0,  0.0),
-		vector3(X, 0.0,  Z),
-
-
-		vector3(-X, -halfY,  0.0),
-		vector3(-X, -halfY,  Z),
-
-		vector3(0.0, -halfY,  0.0),
-		vector3(0.0, -halfY,  Z),
-
-		vector3(X, -halfY,  0.0),
-		vector3(X, -halfY,  Z),
-
-
-		vector3(-X, -Y,  0.0),
-		vector3(-X, -Y,  Z),
-
-		vector3(0.0, -Y,  0.0),
-		vector3(0.0, -Y,  Z),
-
-		vector3(X, -Y,  0.0),
-		vector3(X, -Y,  Z),
-	}
-end
-
-function Round(value, numDecimals)
-	return math.floor(value * 10^numDecimals) / 10^numDecimals
 end
 
 function toPercent(v)

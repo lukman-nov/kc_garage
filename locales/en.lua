@@ -30,5 +30,6 @@ Locales['en'] = {
   ['canot_store'] = 'You can\'t store this vehicle here',
   ['veh_already'] = 'Vehicle already exists',
   ['bank_used'] = 'Your bank balance is used $ %s',
-  ['gps_set'] = 'GPS is already set to your vehicle'
+  ['gps_set'] = 'GPS is already set to your vehicle',
+  ['veh_not_exist'] = 'Vehicle not Exist'
 }
