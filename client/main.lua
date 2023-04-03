@@ -371,6 +371,8 @@ end)
 
 RegisterNetEvent('kc_garage:spawnVehicle')
 AddEventHandler('kc_garage:spawnVehicle', function(data)
+  local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
+  
   WaitForVehicleToLoad(data.vehicle.model)
   ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
     SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)

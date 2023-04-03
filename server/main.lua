@@ -76,25 +76,21 @@ ESX.RegisterServerCallback('kc_garage:getPlayersGroup', function(source, cb)
 	end
 end)
 
-ESX.RegisterServerCallback('kc_garage:checkMoney', function(source, cb, type)
-	local xPlayer = ESX.GetPlayerFromId(source)
-	cb(xPlayer.getMoney())
-end)
-
 RegisterNetEvent('kc_garage:vehicleChecking')
 AddEventHandler('kc_garage:vehicleChecking', function(data)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local vehicles = GetAllVehicles()
 	local canSpawn = false
-	if vehicles[1] == nil then canSpawn = true end
 
-  for i = 1, #vehicles, 1 do 
-    if ESX.Math.Trim(GetVehicleNumberPlateText(vehicles[i])) == data.vehicle.plate then
-			TriggerClientEvent('kc_garage:notify', source, 'error', _K('veh_already'))
-			
-			return TriggerClientEvent('kc_garage:setCoords', source, GetEntityCoords(vehicles[i]))
-    end
-  end
+	if vehicles[1] ~= nil then
+		for i = 1, #vehicles, 1 do 
+			if ESX.Math.Trim(GetVehicleNumberPlateText(vehicles[i])) == data.vehicle.plate then
+				TriggerClientEvent('kc_garage:notify', source, 'error', _K('veh_already'))
+				
+				return TriggerClientEvent('kc_garage:setCoords', source, GetEntityCoords(vehicles[i]))
+			end
+		end
+	end
 
 	if xPlayer.getMoney() >= data.price then
 		if data.notFree then
