@@ -16,7 +16,7 @@ end
 function SetVehicleDeformation(vehicle, deformationPoints, callback)
 	if (not IsDeformationWorse(deformationPoints, GetVehicleDeformation(vehicle))) then return end
 
-	Citizen.CreateThread(function()
+	CreateThread(function()
 		local fDeformationDamageMult = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDeformationDamageMult")
 		local damageMult = 20.0
 		if (fDeformationDamageMult <= 0.55) then
@@ -56,7 +56,7 @@ function SetVehicleDeformation(vehicle, deformationPoints, callback)
 
 			iteration = iteration + 1
 
-			Citizen.Wait(100)
+			Wait(100)
 		end
 		if (callback) then
 			callback()
