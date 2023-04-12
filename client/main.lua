@@ -393,7 +393,7 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
     for impoundName, impound in pairs(Config.Impound) do
       if data.vehType == impound.Type then
         if impound.IsDefaultImpound then
-          TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate)
+          TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate, ESX.PlayerData.job.name)
         end
       end
     end
@@ -411,6 +411,14 @@ function GetVehInGarage(data)
           icon = 'lock',
           arrow = true,
           onSelect = function() GetVehInImpound(data, 'Garages') end,
+        }
+      end
+      
+      if ESX.PlayerData.job.name ~= Config.DefaultJobs then
+        vehicleList['! Get vehicles job'] ={
+          icon = 'share',
+          arrow = true,
+          onSelect = function() GetVehJobInGarage(data, ESX.PlayerData.job.name, 'Garages') end,
         }
       end
       
@@ -475,6 +483,15 @@ end
 function GetVehInImpound(data, key)
   ESX.TriggerServerCallback('kc_garage:getVehiclesInParking', function(vehData)
     local vehicleList = {}
+    
+    if ESX.PlayerData.job.name ~= Config.DefaultJobs then
+      vehicleList['! Get vehicles job'] ={
+        icon = 'share',
+        arrow = true,
+        onSelect = function() GetVehJobInGarage(data, ESX.PlayerData.job.name, 'Impound') end,
+      }
+    end
+
     for i = 1, #vehData, 1 do
       if data.vehType == vehData[i].vehType and not vehData[i].stored then
 
@@ -544,11 +561,88 @@ function GetVehInImpound(data, key)
   end)
 end
 
+function GetVehJobInGarage(data, job, key)
+  ESX.TriggerServerCallback('kc_garage:getVehiclesJobInParking', function(vehData)
+    local vehicleList = {}
+    local menu, stored = nil, nil
+    
+    if vehData then
+      for i = 1, #vehData, 1 do
+        
+        if key == 'Impound' then 
+          menu = 'kc_garage:openVehicleListImpoundMenu'
+          stored = not vehData[i].stored
+        elseif key == 'Garages' then
+          menu = 'kc_garage:openVehicleGaragesMenu'
+          stored = vehData[i].stored
+        end
+
+        local price = Config.VehicleFee.Garages[GetVehicleClassFromName(vehData[i].vehicle.model)]
+        local color = '#2B8A3E'
+  
+        if vehData[i].parking ~= data.parkingKey then
+          price = math.floor(price * Config.FeeSpawnVehicleInAnyGarage[1])
+          color = '#C92A2A'
+        end
+        
+        if data.vehType == vehData[i].vehType and stored then
+          local vehLabel = GetLabelText(GetDisplayNameFromVehicleModel(vehData[i].vehicle.model))
+          vehicleList[vehLabel..' | '..vehData[i].plate] = {
+            description = _K('engine')..toPercent(vehData[i].vehicle.engineHealth)..'% | '.._K('body')..toPercent(vehData[i].vehicle.bodyHealth)..'% | '.._K('fuel')..vehData[i].vehicle.fuelLevel.. '%',
+            icon = GetIcons(vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]),
+            iconColor = color or nil,
+            metadata = {
+              [_K('parking')] = GetParkingLabel(vehData[i].parking, key, vehData[i].vehType), 
+              [_K('plate')] = vehData[i].plate,
+              [_K('fee')] = price,
+              [_K('type')] = vehicleClassName[GetVehicleClassFromName(vehData[i].vehicle.model)]
+            },
+            onSelect = function()
+              spawnData = {
+                type = key,
+                vehType = vehData[i].vehType,
+                spawnPoints = data.spawnPoints,
+                vehicle = vehData[i].vehicle,
+                price = price,
+                notFree = data.NotFree
+              }
+              PlayAnim(Config.UseAnim)
+              local foundSpawn, SpawnPoint = GetAvailableVehicleSpawnPoint(data.spawnPoints)
+              if foundSpawn then
+                if Config.SpawnVehicleInAnyGarage then
+                  TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
+                else
+                  if vehData[i].parking == data.parkingKey then
+                    TriggerServerEvent('kc_garage:vehicleChecking', spawnData)
+                  else
+                    TriggerEvent('kc_garage:notify', 'error', _K('canot_spawn_here'))
+                  end
+                end
+              end
+            end,
+          }
+        end
+      end
+    end
+
+    lib.registerContext({
+      id = 'kc_garage:openVehicleJob',
+      menu = menu,
+      title = GetParkingLabel(data.parkingKey, key, data.vehType),
+      options = vehicleList,
+      onExit = function()
+        PlayAnim(Config.UseAnim)
+      end
+    })
+    lib.showContext('kc_garage:openVehicleJob')
+  end, job)
+end
+
 function SaveVeh(garageName, vehicle)
   local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
   vehicleProps.deformation = GetVehicleDeformation(vehicle)
   ESX.TriggerServerCallback('kc_garage:checkVehicle', function(data)
-    if data and data[1].owner then
+    if data and (data[1].owner or (data[1].job == ESX.PlayerData.job.name)) then
       if Config.Garages[garageName].Type == data[1].vehType then
         if not Config.UseTarget then
           exports.ox_target:removeGlobalVehicle('storedVeh')
@@ -557,7 +651,7 @@ function SaveVeh(garageName, vehicle)
         end
         if DoesEntityExist(vehicle) then
           DeleteVehicle(vehicle)
-          TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps)
+          TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps, ESX.PlayerData.job.name)
           -- TriggerServerEvent('kc_fuel:UpdateVehicleDateTimeIn', plate) -- REMOVE THIS
         else
           TriggerEvent('kc_garage:notify', 'error', _K('veh_not_exist'))
