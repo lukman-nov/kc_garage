@@ -14,9 +14,11 @@ Config.PayIn = 'money' -- Player can pay vehicle fee with 'money' or 'bank'
 Config.LockKeyVehicle = 'U' -- https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
 
 Config.CmdVehDelete = 'asuransi' -- Admin command for delete vehicle in the words
-Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in Config.DeleteVehiclesAt line 84 config.lua
+Config.AutoDelVeh = true -- Automatically confiscate vehicles at a certain time, you can set the time in `Config.DeleteVehiclesAt`
 Config.DeleteVehicleTimer = 180 -- in second
-Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone` line 95 config.lua
+Config.DeleteVehiclesIfInSafeZone = true -- you can set safe zone in `Config.SafeZone`
+
+Config.DefaultJobs = 'warga' -- default ESX 'unemployed'
 
 Config.VehicleFee = { -- if set to 0 the player does not pay
   Garages = { -- Garage Fee
