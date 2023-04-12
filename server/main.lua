@@ -9,7 +9,35 @@ ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb
 	{
 		['@identifier'] = xPlayer.identifier,
 	}, function(result)
+		if result[1] then
+			local vehicles = {}
+			for i = 1, #result, 1 do
+				local currenType = result[i].type
 
+				if currenType == 'helicopter' or currenType == 'airplane' then
+					currenType = 'aircraft'
+				end
+				
+				if result[i].parking and not result[i].job then
+					table.insert(vehicles, {
+						vehicle 	= json.decode(result[i].vehicle),
+						plate 		= result[i].plate,
+						parking   = result[i].parking,
+						vehType 	= currenType,
+						stored 		= result[i].stored
+					})
+				end
+			end
+
+			cb(vehicles)
+		end
+	end)
+end)
+
+ESX.RegisterServerCallback('kc_garage:getVehiclesJobInParking', function(source, cb, job)
+	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `job` = @job', {
+		['@job'] = job
+	}, function(result)
 		if result[1] then
 			local vehicles = {}
 			for i = 1, #result, 1 do
@@ -31,6 +59,8 @@ ESX.RegisterServerCallback('kc_garage:getVehiclesInParking', function(source, cb
 			end
 
 			cb(vehicles)
+		else
+			cb(false)
 		end
 	end)
 end)
@@ -38,14 +68,13 @@ end)
 ESX.RegisterServerCallback('kc_garage:checkVehicle', function(source, cb, plate)
   local xPlayer = ESX.GetPlayerFromId(source)
 
-	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `owner` = @identifier AND `plate` = @plate',
+	MySQL.query('SELECT * FROM `owned_vehicles` WHERE `plate` = @plate',
 	{
-		['@identifier'] 	= xPlayer.identifier,
-		['@plate']     		= plate
+		['@plate'] = plate
 	}, function(result)
 		local data = {}
 		if result[1] then
-			if result[1].owner == xPlayer.identifier then
+			if (result[1].owner == xPlayer.identifier or result[1].job == xPlayer.job.name) then
 				
 				local currenType = result[1].type
 
@@ -56,7 +85,8 @@ ESX.RegisterServerCallback('kc_garage:checkVehicle', function(source, cb, plate)
 				if result[1].type and not result[1].stored then
 					table.insert(data, {
 						owner = true,
-						vehType = currenType
+						vehType = currenType,
+						job = result[1].job
 					})
 					cb(data)
 				end
@@ -113,32 +143,60 @@ AddEventHandler('kc_garage:vehicleChecking', function(data)
 end)
 
 RegisterServerEvent('kc_garage:updateOwnedVehicle')
-AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, vehicleProps)
+AddEventHandler('kc_garage:updateOwnedVehicle', function(stored, parking, vehicleProps, job)
 	local src = source
 	local xPlayer  = ESX.GetPlayerFromId(src)
-
-	MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `vehicle` = @vehicle WHERE `plate` = @plate AND `owner` = @identifier',
-	{
-		['@identifier'] = xPlayer.identifier,
-		['@vehicle'] 	= json.encode(vehicleProps),
-		['@plate'] 		= vehicleProps.plate,
-		['@stored']     = stored,
-		['@parking']    = parking,
-	})
+	MySQL.query('SELECT job FROM owned_vehicles WHERE `plate` = @plate', {
+		['@plate'] = vehicleProps.plate
+	}, function(result)
+		if result[1].job == nil then
+			MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `vehicle` = @vehicle WHERE `plate` = @plate AND `owner` = @identifier',
+			{
+				['@identifier'] = xPlayer.identifier,
+				['@vehicle'] 	= json.encode(vehicleProps),
+				['@plate'] 		= vehicleProps.plate,
+				['@stored']     = stored,
+				['@parking']    = parking,
+			})
+		elseif result[1].job == job then
+			MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking, `vehicle` = @vehicle WHERE `plate` = @plate AND `job` = @job',
+			{
+				['@job'] 			= job,
+				['@vehicle'] 	= json.encode(vehicleProps),
+				['@plate'] 		= vehicleProps.plate,
+				['@stored']   = stored,
+				['@parking']  = parking,
+			})
+		end
+	end)
 end)
 
 RegisterNetEvent('kc_garage:updateStoredVehicle')
-AddEventHandler('kc_garage:updateStoredVehicle', function(stored, parking, plate)
+AddEventHandler('kc_garage:updateStoredVehicle', function(stored, parking, plate, job)
 	local src = source
 	local xPlayer  = ESX.GetPlayerFromId(src)
-	
-	MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking WHERE `plate` = @plate AND `owner` = @identifier',
-	{
-		['@identifier'] = xPlayer.identifier,
-		['@plate'] 			= plate,
-		['@parking']		= parking,
-		['@stored']  		= stored,
-	})
+
+	MySQL.query('SELECT job FROM owned_vehicles WHERE `plate` = @plate', {
+		['@plate'] = plate
+	}, function(result)
+		if result[1].job == nil then
+			MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking WHERE `plate` = @plate AND `owner` = @identifier',
+			{
+				['@identifier'] = xPlayer.identifier,
+				['@plate'] 			= plate,
+				['@parking']		= parking,
+				['@stored']  		= stored,
+			})
+		elseif result[1].job == job then
+			MySQL.update('UPDATE owned_vehicles SET `stored` = @stored, `parking` = @parking WHERE `plate` = @plate AND `job` = @job',
+			{
+				['@job'] 				= job,
+				['@plate'] 			= plate,
+				['@parking']		= parking,
+				['@stored']  		= stored,
+			})
+		end
+	end)
 end)
 
 RegisterServerEvent('kc_garage:updateVehicleProperties')
@@ -177,7 +235,9 @@ AddEventHandler('kc_garage:jobsImpoundVehicle', function(currentParking, plate, 
 			}, function(result)
 				if result[1] then
 					local xTarget = ESX.GetPlayerFromIdentifier(result[1].owner)
-					TriggerClientEvent('kc_garage:notify', xTarget.source, 'inform', _K('target_impounded', plate, job.label))
+					if xTarget then
+						TriggerClientEvent('kc_garage:notify', xTarget.source, 'inform', _K('target_impounded', plate, job.label))
+					end
 				end
 			end)
 		end
@@ -191,13 +251,18 @@ AddEventHandler('kc_garage:requestVehicleLock', function(netId, lockstatus, plat
 	local xPlayer  = ESX.GetPlayerFromId(src)
   if not plate then return end
 
-	MySQL.query('SELECT owner, peopleWithKeys as count FROM owned_vehicles WHERE `plate` = @plate', 
+	MySQL.query('SELECT owner, job, peopleWithKeys as count FROM owned_vehicles WHERE `plate` = @plate', 
 	{
 		['@plate'] = plate
 	}, function (result)
 		if result and result[1] then
 			vehiclesCache[plate] = {}
 			vehiclesCache[plate][result[1].owner] = true
+			
+			if result[1].job then
+				vehiclesCache[plate][result[1].job] = true
+			end
+
 			local otherKeys = json.decode(result[1].peopleWithKeys)
 			if not otherKeys then otherKeys = {} end
 			for k, v in pairs(otherKeys) do
@@ -221,15 +286,17 @@ AddEventHandler('kc_garage:vehicleLock', function(src, netId, lockstatus, plate)
 end)
 
 RegisterNetEvent('kc_garage:giveKeyToPerson')
-AddEventHandler('kc_garage:giveKeyToPerson', function(target, plate)
-	local xPlayer = ESX.GetPlayerFromId(source)
+AddEventHandler('kc_garage:giveKeyToPerson', function(plate, target)
+	local src = source
+	local xPlayer = ESX.GetPlayerFromId(src)
 	local xTarget = ESX.GetPlayerFromId(target)
 	if not xTarget and not xPlayer then return end
 
-	MySQL.query('SELECT * FROM owner_vehicles WHERE `plate` = @plate AND `owner` = @identifier ', {
+	MySQL.query('SELECT * FROM owned_vehicles WHERE `plate` = @plate AND `owner` = @identifier ', {
+		['@identifier'] = xPlayer.identifier,
 		['@plate'] = plate,
-		['@identifier'] = xPlayer.identifier
 	}, function(result)
+		print(plate)
 		if result[1] then
 			for i = 1,#result, 1 do 
 				if result[i].owner == xPlayer.identifier then
