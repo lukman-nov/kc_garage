@@ -375,29 +375,32 @@ AddEventHandler('kc_garage:spawnVehicle', function(data)
   
   WaitForVehicleToLoad(data.vehicle.model)
   ESX.Game.SpawnVehicle(data.vehicle.model, SpawnPoint.Pos, SpawnPoint.Heading, function(vehicle)
-    SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
-    SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
-    SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
-    SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
-    ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
-    
-    if Config.AutoTeleportToVehicle then
-      TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
-      SetVehicleEngineOn(vehicle, true, true)
-    end
+    if DoesEntityExist(vehicle) then
+      ESX.Game.SetVehicleProperties(vehicle, data.vehicle)
+      
+      SetVehicleEngineHealth(vehicle, data.vehicle.engineHealth)
+      SetVehicleFuelLevel(vehicle, data.vehicle.fuelLevel)
+      SetVehicleBodyHealth(vehicle, data.vehicle.bodyHealth)
+      SetVehicleDeformation(vehicle, data.vehicle.deformation or GetVehicleDeformation(vehicle))
+      
+      if Config.AutoTeleportToVehicle then
+        TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
+        SetVehicleEngineOn(vehicle, true, true)
+      end
 
-    if Config.AutoLockVeh then
-      SetVehicleDoorsLocked(vehicle, 2)
-    end
-    TriggerServerEvent('kc_garage:payFee', data)
-    for impoundName, impound in pairs(Config.Impound) do
-      if data.vehType == impound.Type then
-        if impound.IsDefaultImpound then
-          TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate, ESX.PlayerData.job.name)
+      if Config.AutoLockVeh then
+        SetVehicleDoorsLocked(vehicle, 2)
+      end
+      TriggerServerEvent('kc_garage:payFee', data)
+      for impoundName, impound in pairs(Config.Impound) do
+        if data.vehType == impound.Type then
+          if impound.IsDefaultImpound then
+            TriggerServerEvent('kc_garage:updateStoredVehicle', 0, impoundName, data.vehicle.plate, ESX.PlayerData.job.name)
+          end
         end
       end
+      TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
     end
-    TriggerEvent('kc_garage:notify', 'success', _K('veh_spawn'))
   end)
 end)
 
@@ -650,8 +653,8 @@ function SaveVeh(garageName, vehicle)
           Wait(2000)
         end
         if DoesEntityExist(vehicle) then
-          DeleteVehicle(vehicle)
           TriggerServerEvent('kc_garage:updateOwnedVehicle', 1, garageName, vehicleProps, ESX.PlayerData.job.name)
+          DeleteVehicle(vehicle)
           -- TriggerServerEvent('kc_fuel:UpdateVehicleDateTimeIn', plate) -- REMOVE THIS
         else
           TriggerEvent('kc_garage:notify', 'error', _K('veh_not_exist'))
