@@ -4,7 +4,7 @@ Config.Locale = 'en'  -- 'en' or 'id'
 Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 Config.UseAnim = true -- play animation when requesting vehicle list?
-Config.ShowVehImpoundInGarage = true
+Config.ShowVehImpoundInGarage = false
 Config.SpawnVehicleInAnyGarage = false -- if true, the fee will be multiplied.
 Config.FeeSpawnVehicleInAnyGarage = {[1] = 2, [2] = 3} -- [1] = garages fee * 2, [2] = impound fee * 3 and if you set 0 it's the same as free
 
@@ -22,28 +22,28 @@ Config.DefaultJobs = 'warga' -- default ESX 'unemployed'
 
 Config.VehicleFee = { -- if set to 0 the player does not pay
   Garages = { -- Garage Fee
-    [0] = 5000, -- Compacts
-    [1] = 5000, -- Sedans
-    [2] = 5000, -- SUVs
-    [3] = 5000, -- Coupes
-    [4] = 5000, -- Muscle
-    [5] = 5000, -- Sports Classics
-    [6] = 5000, -- Sports
-    [7] = 5000, -- Super
-    [8] = 2000, -- Motorcycles
-    [9] = 5000, -- Off-road
-    [10] = 5000, -- Industrial
-    [11] = 5000, -- Utility
-    [12] = 5000, -- Vans
+    [0] = 1500, -- Compacts
+    [1] = 1500, -- Sedans
+    [2] = 1500, -- SUVs
+    [3] = 1500, -- Coupes
+    [4] = 1500, -- Muscle
+    [5] = 1500, -- Sports Classics
+    [6] = 1500, -- Sports
+    [7] = 1500, -- Super
+    [8] = 700, -- Motorcycles
+    [9] = 1500, -- Off-road
+    [10] = 1500, -- Industrial
+    [11] = 1500, -- Utility
+    [12] = 1500, -- Vans
     [13] = 0, -- Cylces
     [14] = 50000, -- Boats
     [15] = 50000, -- Helicopters
     [16] = 50000, -- Planes
-    [17] = 5000, -- Service
+    [17] = 1500, -- Service
     [18] = 0, -- Emergency
-    [19] = 5000, -- Military
-    [20] = 5000, -- Commercial
-    [21] = 5000 -- Train 
+    [19] = 1500, -- Military
+    [20] = 1500, -- Commercial
+    [21] = 0 -- Train 
   },
   Impound = { -- Impound Fee
     [0] = 15000, -- Compacts
@@ -67,7 +67,7 @@ Config.VehicleFee = { -- if set to 0 the player does not pay
     [18] = 0, -- Emergency
     [19] = 15000, -- Military
     [20] = 15000, -- Commercial
-    [21] = 15000 -- Train 
+    [21] = 0 -- Train 
   }
 }
 
@@ -106,8 +106,8 @@ Config.Garages = { -- Garages Config
     Type = 'car', -- 'car', 'aircraft' and 'boat'
     Blip = true, -- if private garages you can set false
     NotFree = true, -- fee garages
-    Coords = vector3(214.7889, -806.4965, 30.8092), -- blips and ped coords
-    PedHeading = 341.4469, -- ped heading
+    Coords = vector3(-282.9324, -888.8280, 31.0806), -- blips and ped coords
+    PedHeading = 67.9133, -- ped heading
     Players = { -- Players table allowed to access garages
       -- ex: {'steam:xxxxxxxxxxxx'}
     },
@@ -115,21 +115,22 @@ Config.Garages = { -- Garages Config
       -- ex: {'police'}
     },
     SpawnPoint = {
-      { Pos = vector3(222.7534, -804.3437, 30.1486), Heading = 248.5339 },
-      { Pos = vector3(223.8556, -801.9759, 30.1351), Heading = 248.5339 },
-      { Pos = vector3(224.4868, -799.4138, 30.1383), Heading = 248.5339 },
-      { Pos = vector3(225.3986, -796.8544, 30.1434), Heading = 248.5339 },
-      { Pos = vector3(225.7808, -794.0939, 30.1681), Heading = 249.2099 },
-      { Pos = vector3(226.4725, -791.5930, 30.1775), Heading = 248.3668 },
-      { Pos = vector3(227.9673, -789.1436, 30.1805), Heading = 248.0247 },
+      { Pos = vector3(-285.8076, -888.3562, 30.6685), Heading = 168.2006 },
+      { Pos = vector3(-293.1115, -886.6700, 30.6687), Heading = 168.3685 },
+      { Pos = vector3(-296.7069, -886.0822, 30.6686), Heading = 167.9488 },
+      { Pos = vector3(-300.0546, -884.6438, 30.6687), Heading = 167.5948 },
+      { Pos = vector3(-303.8913, -884.4731, 30.6685), Heading = 167.9141 },
+      { Pos = vector3(-307.3475, -882.6489, 30.6686), Heading = 168.5882 },
+      { Pos = vector3(-289.4365, -887.6770, 30.6684), Heading = 168.6440 },
     },
     DeletePoint = {
-      { Pos = vector3(207.7707, -796.0760, 30.9834) },
-      { Pos = vector3(209.2426, -793.8544, 30.9834) },
-      { Pos = vector3(210.0643, -791.2812, 30.9834) },
-      { Pos = vector3(210.9966, -788.7125, 30.4128) },
-      { Pos = vector3(211.4733, -785.8821, 30.4111) },
-      { Pos = vector3(212.6457, -783.4863, 30.3930) },
+      { Pos = vector3(-285.8076, -888.3562, 30.6685) },
+      { Pos = vector3(-293.1115, -886.6700, 30.6687) },
+      { Pos = vector3(-296.7069, -886.0822, 30.6686) },
+      { Pos = vector3(-300.0546, -884.6438, 30.6687) },
+      { Pos = vector3(-303.8913, -884.4731, 30.6685) },
+      { Pos = vector3(-307.3475, -882.6489, 30.6686) },
+      { Pos = vector3(-289.4365, -887.6770, 30.6684) },
     }
   },
 
@@ -337,27 +338,6 @@ Config.Garages = { -- Garages Config
     }
   },
   
-  KucluckHouse = {
-    Label = 'Kucluck House',
-    Type = 'car',
-    Blip = false,
-    NotFree = false,
-    Coords = vector3(-548.7320, 5004.7842, 153.5449), 
-    PedHeading = 235.7023,
-    Players = {
-      
-    },
-    Groups = {
-      
-    },
-    SpawnPoint = {
-      { Pos = vector3(-541.0726, 5009.7109, 153.5407), Heading = 232.1175 },
-    },
-    DeletePoint = {
-      { Pos = vector3(-541.0726, 5009.7109, 153.5407) },
-    }
-  },
-
   PoliceGarage = {
     Label = 'Police Garage',
     Type = 'car',
@@ -389,72 +369,72 @@ Config.Garages = { -- Garages Config
     }
   },
 
-  LSAirPort = {
-    Label = 'Los Santos Airport',
-    Type = 'aircraft',
-    Blip = true,
-    NotFree = true,
-    Coords = vector3(-1122.4502, -2840.5667, 13.9458), 
-    PedHeading = 152.0285,
-    Players = {
+  -- LSAirPort = {
+  --   Label = 'Los Santos Airport',
+  --   Type = 'aircraft',
+  --   Blip = true,
+  --   NotFree = true,
+  --   Coords = vector3(-1122.4502, -2840.5667, 13.9458), 
+  --   PedHeading = 152.0285,
+  --   Players = {
       
-    },
-    Groups = {
+  --   },
+  --   Groups = {
       
-    },
-    SpawnPoint = {
-      { Pos = vector3(-1178.2308, -2845.7175, 13.9458), Heading = 146.1286 },
-      { Pos = vector3(-1145.8920, -2864.2798, 13.9460), Heading = 153.7971 },
-      { Pos = vector3(-1112.4072, -2883.8889, 13.9460), Heading = 152.9144 },
-    },
-    DeletePoint = {
-      { Pos = vector3(-1178.2308, -2845.7175, 13.9458) },
-      { Pos = vector3(-1145.8920, -2864.2798, 13.9460) },
-      { Pos = vector3(-1112.4072, -2883.8889, 13.9460) },
-    }
-  },
+  --   },
+  --   SpawnPoint = {
+  --     { Pos = vector3(-1178.2308, -2845.7175, 13.9458), Heading = 146.1286 },
+  --     { Pos = vector3(-1145.8920, -2864.2798, 13.9460), Heading = 153.7971 },
+  --     { Pos = vector3(-1112.4072, -2883.8889, 13.9460), Heading = 152.9144 },
+  --   },
+  --   DeletePoint = {
+  --     { Pos = vector3(-1178.2308, -2845.7175, 13.9458) },
+  --     { Pos = vector3(-1145.8920, -2864.2798, 13.9460) },
+  --     { Pos = vector3(-1112.4072, -2883.8889, 13.9460) },
+  --   }
+  -- },
   
-  MBAirport = {
-    Label = 'Military Base Airport',
-    Type = 'aircraft',
-    Blip = true,
-    NotFree = true,
-    Coords = vector3(-2211.6267, 3167.5488, 32.8101), 
-    PedHeading = 330.5554,
-    Players = {
+  -- MBAirport = {
+  --   Label = 'Military Base Airport',
+  --   Type = 'aircraft',
+  --   Blip = true,
+  --   NotFree = true,
+  --   Coords = vector3(-2211.6267, 3167.5488, 32.8101), 
+  --   PedHeading = 330.5554,
+  --   Players = {
   
-    },
-    Groups = {
+  --   },
+  --   Groups = {
       
-    },
-    SpawnPoint = {
-      { Pos = vector3(-2186.9236, 3172.0801, 32.8102), Heading = 326.1197 },
-    },
-    DeletePoint = {
-      { Pos = vector3(-2186.9236, 3172.0801, 32.8102)},
-    }
-  },
+  --   },
+  --   SpawnPoint = {
+  --     { Pos = vector3(-2186.9236, 3172.0801, 32.8102), Heading = 326.1197 },
+  --   },
+  --   DeletePoint = {
+  --     { Pos = vector3(-2186.9236, 3172.0801, 32.8102)},
+  --   }
+  -- },
   
-  PacificOcean = {
-    Label = 'Pacific Ocean Watercraft',
-    Type = 'boat',
-    Blip = true,
-    NotFree = true,
-    Coords = vector3(-1799.7592, -1225.0562, 1.5826), 
-    PedHeading = 144.0511,
-    Players = {
+  -- PacificOcean = {
+  --   Label = 'Pacific Ocean Watercraft',
+  --   Type = 'boat',
+  --   Blip = true,
+  --   NotFree = true,
+  --   Coords = vector3(-1799.7592, -1225.0562, 1.5826), 
+  --   PedHeading = 144.0511,
+  --   Players = {
   
-    },
-    Groups = {
+  --   },
+  --   Groups = {
       
-    },
-    SpawnPoint = {
-      { Pos = vector3(-1796.9568, -1229.5969, 0.2092), Heading = 145.8580 },
-    },
-    DeletePoint = {
-      { Pos = vector3(-1796.9568, -1229.5969, 0.2092)},
-    }
-  },
+  --   },
+  --   SpawnPoint = {
+  --     { Pos = vector3(-1796.9568, -1229.5969, 0.2092), Heading = 145.8580 },
+  --   },
+  --   DeletePoint = {
+  --     { Pos = vector3(-1796.9568, -1229.5969, 0.2092)},
+  --   }
+  -- },
 
 }
 
@@ -472,31 +452,31 @@ Config.Impound = { -- Impound Config
 		},
 	},
 
-	SandyShoresAir = {
-		Label = 'Sandy Shores Air',
-    Type = 'aircraft',
-    IsDefaultImpound = true,
-		Blip = true,
-    NotFree = true,
-		Coords = vector3(1727.7544, 3293.1646, 41.1973),
-		PedHeading = 193.5272,
-		SpawnPoint = {
-			{ Pos = vector3(1749.2124, 3264.2148, 41.2852), Heading = 102.5581, }
-		},
-	},
+	-- SandyShoresAir = {
+	-- 	Label = 'Sandy Shores Air',
+  --   Type = 'aircraft',
+  --   IsDefaultImpound = true,
+	-- 	Blip = true,
+  --   NotFree = true,
+	-- 	Coords = vector3(1727.7544, 3293.1646, 41.1973),
+	-- 	PedHeading = 193.5272,
+	-- 	SpawnPoint = {
+	-- 		{ Pos = vector3(1749.2124, 3264.2148, 41.2852), Heading = 102.5581, }
+	-- 	},
+	-- },
 
-	SandyShoresBoat = {
-		Label = 'Sandy Shores Watercraft',
-    Type = 'boat',
-    IsDefaultImpound = true,
-		Blip = true,
-    NotFree = true,
-		Coords = vector3(1733.4327, 3985.1807, 31.9787),
-		PedHeading = 121.1930,
-		SpawnPoint = {
-			{ Pos = vector3(1730.9972, 3990.8796, 29.7878), Heading = 304.6193, }
-		},
-	},
+	-- SandyShoresBoat = {
+	-- 	Label = 'Sandy Shores Watercraft',
+  --   Type = 'boat',
+  --   IsDefaultImpound = true,
+	-- 	Blip = true,
+  --   NotFree = true,
+	-- 	Coords = vector3(1733.4327, 3985.1807, 31.9787),
+	-- 	PedHeading = 121.1930,
+	-- 	SpawnPoint = {
+	-- 		{ Pos = vector3(1730.9972, 3990.8796, 29.7878), Heading = 304.6193, }
+	-- 	},
+	-- },
 
 	JobsImpound = { -- if for jobs keywords should start with the word Jobs
 		Label = 'Police Impound',
