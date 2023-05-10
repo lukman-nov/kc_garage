@@ -1,6 +1,6 @@
 Config = {}
 Config.CheckForUpdates = true  -- check for update available?
-Config.Locale = 'en'  -- 'en' or 'id'
+Config.Locale = 'id'  -- 'en' or 'id'
 Config.UseTarget = true -- if you not use ox_target you can set false
 Config.Notify = 'mythic_notify' -- 'mythic_notify', 'lib', 'ESX'
 Config.UseAnim = true -- play animation when requesting vehicle list?
