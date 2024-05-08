@@ -1,32 +1,44 @@
-fx_version 	'adamant'
-game 				'gta5'
-lua54 			'yes'
+fx_version 		'adamant'
+game 					'gta5'
+lua54 				'yes'
 
-name 				'kc_garage'
-description 'Garages for ESX Legacy'
-author 			'Lukman_Nov#5797'
-repository 	'https://github.com/lukman-nov/kc_garage'
-version 		'2.3.2'
-license    	'GNU General Public License v3.0'
+name 					'kc_garage'
+description 	'Advanced Garages for ESX & QB'
+author 				'Lukman_Nov#5797'
+version 			'2.5.0'
+license    		'GNU General Public License v3.0'
 
 shared_scripts {
 	'@ox_lib/init.lua',
-  'locale.lua',
+  'locales.lua',
+  'shared/config.lua',
+  'shared/garages.lua',
+  'shared/impounds.lua',
   'locales/*.lua',
-  'config.lua'
+	'function.lua'
 }
 
 client_scripts {
-	'client/*.lua'
+	'bridge/**/client.lua',
+	'client/main.lua',
+	'client/function.lua',
+	'client/mainAPI.lua',
+	'client/deformation.lua',
+	'client/vehicle_names.lua',
 }
 
 server_scripts {
 	'@mysql-async/lib/MySQL.lua',
-	'server/*.lua'
+	'bridge/**/server.lua',
+	'server/main.lua',
+	'server/update.lua',
 }
 
-dependencies { 
-  '/server:5848',
-  '/gameBuild:1868',
-  '/onesync',
+escrow_ignore {
+	'bridge/**/*.lua',
+	'client/*.lua',
+	'locales/*.lua',
+	'server/main.lua',
+	'shared/*.lua',
+	'function.lua',
 }
