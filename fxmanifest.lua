@@ -5,7 +5,7 @@ lua54 				'yes'
 name 					'kc_garage'
 description 	'Advanced Garages for ESX & QB'
 author 				'Lukman_Nov#5797'
-version 			'2.5.0'
+version 			'2.5.1'
 license    		'GNU General Public License v3.0'
 
 shared_scripts {
