@@ -3,5 +3,5 @@ client
 locales
 server
 shared
-function.lua
+web
 locales.lua

@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `player_vehicles`;
 CREATE TABLE IF NOT EXISTS `player_vehicles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `license` varchar(50) DEFAULT NULL,
@@ -22,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `player_vehicles` (
   `job` varchar(50) DEFAULT NULL,
   `peopleWithKeys` varchar(50) DEFAULT NULL,
   `shared` int(11) DEFAULT 1,
+  `km` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `plate` (`plate`),
   KEY `citizenid` (`citizenid`),
