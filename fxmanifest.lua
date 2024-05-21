@@ -5,7 +5,7 @@ lua54 				'yes'
 name 					'Kucluck Garage V2'
 description 	'Advanced Garages for ESX & QB V2'
 author 				'Lukman_Nov#5797'
-version 			'2.6.0'
+version 			'2.5.1'
 license    		'GNU General Public License v3.0'
 
 shared_scripts {
